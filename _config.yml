@@ -1,0 +1,21 @@
+title: Application Security Hub
+description: Cuaderno de aprendizaje sobre seguridad de aplicaciones.
+remote_theme: just-the-docs/just-the-docs
+
+# Just the Docs config
+nav_order: 1
+permalink: pretty
+color_scheme: light
+
+# Sidebar navigation
+nav:
+  - title: "Inicio"
+    url: /
+  - title: "Vulnerabilidades Web - Teoría"
+    url: /docs/vulnerabilidades-teoria
+  - title: "Vulnerabilidades Web - Explotación"
+    url: /docs/vulnerabilidades-explotacion
+  - title: "DevSecOps"
+    url: /docs/devsecops
+  - title: "Diseño Seguro"
+    url: /docs/diseno-seguro
