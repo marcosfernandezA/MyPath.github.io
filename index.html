@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Application Security Hub</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="sidebar">
+    <h2>Menú</h2>
+    <button onclick="showSection('intro')">Introducción</button>
+    <button onclick="showSection('temas')">¿Qué encontrarás?</button>
+    <button onclick="showSection('nota')">Nota final</button>
+  </div>
+
+  <div class="content">
+    <div id="intro">
+      <h1>Application Security Hub</h1>
+      <p>Hola 👋 Este repositorio sirve como cuaderno de aprendizaje sobre Application Security...</p>
+    </div>
+
+    <div id="temas" style="display:none;">
+      <h2>¿Qué encontrarás?</h2>
+      <ul>
+        <li>Vulnerabilidades web (con PoC y mitigaciones).</li>
+        <li>Buenas prácticas de SSDLC.</li>
+        <li>Seguridad en pipelines CI/CD.</li>
+        <li>Notas sobre diseño seguro.</li>
+      </ul>
+    </div>
+
+    <div id="nota" style="display:none;">
+      <h2>Nota final</h2>
+      <p>El contenido que se suba no tiene porque ser óptimo y puede contener erratas.<br>
+      Mi objetivo no va a ser educar, sino aprender 🙂</p>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
