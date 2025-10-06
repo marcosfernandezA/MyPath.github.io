@@ -9,22 +9,9 @@
 <body>
 
     <header>
-        <nav class="navbar">
-            <div class="nav-logo">
-                <span class="wave">🛡️</span> Marcos
-            </div>
-            <ul>
-                <li class="dropdown">
-                    <a href="#web-security-index" id="web-security-link"><span>🔒</span> Web Security</a>
-                    <ul class="dropdown-content">
-                        <li><a href="#xss" id="xss-link"><span>🧬</span> XSS</a></li>
-                        <li><a href="#sql-injection" id="sql-injection-link"><span>💾</span> SQL Injection</a></li>
-                    </ul>
-                </li>
-                <li><a href="#devsecops"><span>⚙️</span> DevSecOps</a></li>
-                <li><a href="#design-security"><span>🎨</span> Design and Security</a></li>
-            </ul>
-        </nav>
+        <div id="global-header"></div>
+        <script src="loadHeader.js"></script>
+        <script>window.loadHeader && window.loadHeader('global-header');</script>
     </header>
     <main>
         <section id="index" class="card">
@@ -56,12 +43,14 @@
             <h2><span>🧬</span> XSS (Cross-Site Scripting)</h2>
             <div class="info-box">
                 XSS es una vulnerabilidad que permite a un atacante inyectar scripts maliciosos en páginas web vistas por otros usuarios. Esto puede llevar al robo de información, manipulación de la página y otros ataques.
+                <div style="margin-left: auto; margin-top: 12px;"><a href="WebSecurity/xss/TheoryXSS.html" class="topic-link">Leer teoría completa →</a></div>
             </div>
         </section>
         <section id="sql-injection" class="card hidden">
             <h2><span>💾</span> SQL Injection</h2>
             <div class="info-box">
                 SQL Injection es una vulnerabilidad que permite a un atacante manipular las consultas SQL de una aplicación, accediendo o modificando datos de manera no autorizada.
+                <div style="margin-left: auto; margin-top: 12px;"><a href="WebSecurity/sqlInjection/TheorySqli.html" class="topic-link">Leer teoría completa →</a></div>
             </div>
         </section>
         <section id="devsecops" class="card hidden">

@@ -24,6 +24,10 @@ header {
     background: #222;
     height: 64px;
 }
+.global-nav {
+    /* Shared navbar adjustments: ensure consistent padding and background inheritance */
+    box-sizing: border-box;
+}
 .nav-logo {
     font-size: 1.5rem;
     font-weight: bold;
@@ -57,8 +61,9 @@ header {
     background: #3b82f6;
     color: #fff;
 }
-.dropdown-content {
-    display: none;
+.dropdown .dropdown-content {
+    /* hidden by default; use !important to prevent accidental overrides */
+    display: none !important;
     position: absolute;
     background: #333;
     min-width: 180px;
@@ -75,7 +80,12 @@ header {
     border-radius: 0;
 }
 .dropdown:hover .dropdown-content {
-    display: block;
+    display: block !important;
+}
+
+/* Allow keyboard users to open the dropdown when focusing inside the li */
+.dropdown:focus-within .dropdown-content {
+    display: block !important;
 }
 .profile-header {
     display: flex;
@@ -188,4 +198,76 @@ section {
         flex-direction: column;
         gap: 0;
     }
+}
+
+/* Layout and styles for theory pages with left index sidebar */
+.layout {
+    display: flex;
+    gap: 24px;
+    max-width: 1100px;
+    margin: 32px auto;
+    padding: 0 16px;
+    align-items: flex-start;
+}
+.sidebar {
+    width: 280px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 14px;
+    box-shadow: 0 6px 20px rgba(59,130,246,0.06);
+    flex: 0 0 280px;
+}
+.sidebar h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.05rem;
+}
+.search-input {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #e6eefb;
+    margin-bottom: 12px;
+    font-size: 0.95rem;
+}
+.accordion .accordion-item {
+    border-top: 1px solid #f0f4ff;
+}
+.accordion-header {
+    padding: 10px 6px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+}
+.accordion-header small {
+    color: #666;
+    font-weight: 500;
+}
+.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.24s ease;
+    padding: 0 6px;
+}
+.accordion-item.open .accordion-content {
+    max-height: 600px;
+}
+.accordion-content ul { list-style: none; padding: 6px 0 12px 0; margin: 0; }
+.accordion-content li a.index-link {
+    display: block;
+    padding: 8px 10px;
+    color: #0f172a;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 0.95rem;
+}
+.accordion-content li a.index-link:hover { background: #f0f7ff; }
+
+.content-area { flex: 1 1 auto; }
+.content-area .card { margin: 0; }
+
+@media (max-width: 900px) {
+    .layout { flex-direction: column; padding: 0 12px; }
+    .sidebar { width: 100%; flex: none; }
 }

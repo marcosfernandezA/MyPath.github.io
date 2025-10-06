@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theory - SQL Injection</title>
+    <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+
+    <header>
+    <nav class="navbar global-nav">
+            <a href="../../index.html#index" class="nav-logo" id="nav-logo">
+                <span class="wave">🛡️</span> AppSec in a Nutshell
+            </a>
+            <ul>
+                <li class="dropdown">
+                    <a href="../../index.html#web-security-index" id="web-security-link"><span>🔒</span> Web Security</a>
+                    <ul class="dropdown-content">
+                        <li><a href="../../WebSecurity/xss/TheoryXSS.html" id="xss-link"><span>🧬</span> XSS</a></li>
+                        <li><a href="../../WebSecurity/sqlInjection/TheorySqli.html" id="sql-injection-link"><span>💾</span> SQL Injection</a></li>
+                    </ul>
+                </li>
+                <li><a href="../../index.html#devsecops"><span>⚙️</span> DevSecOps</a></li>
+                <li><a href="../../index.html#design-security"><span>🎨</span> Design and Security</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="layout">
+            <aside class="sidebar">
+                <h3>Índice</h3>
+                <input type="search" class="search-input" id="sidebar-search" placeholder="Buscar en el índice...">
+
+                <div class="accordion" id="sidebar-accordion">
+                    <div class="accordion-item" data-key="theory">
+                        <div class="accordion-header">Theory <small>▾</small></div>
+                        <div class="accordion-content">
+                            <ul>
+                                <li><a href="#sqli-intro" class="index-link">1. SQL Injection</a></li>
+                                <li><a href="#sqli-blind" class="index-link">2. Blind SQL Injection</a></li>
+                                <li><a href="#sqli-timed" class="index-link">3. Time-based SQL Injection</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item" data-key="portswigger">
+                        <div class="accordion-header">PortSwigger labs <small>▾</small></div>
+                        <div class="accordion-content">
+                            <ul>
+                                <li><a href="PortSwigger/Lab1.html" class="index-link">Lab: SQLi 1</a></li>
+                                <li><a href="PortSwigger/Lab2.html" class="index-link">Lab: SQLi 2</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item" data-key="htb">
+                        <div class="accordion-header">Hack The Box <small>▾</small></div>
+                        <div class="accordion-content">
+                            <ul>
+                                <li><a href="HackTheBox/Machine1.html" class="index-link">Machine: Example1</a></li>
+                                <li><a href="HackTheBox/Machine2.html" class="index-link">Machine: Example2</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <div class="content-area">
+                <section class="card" id="sqli-intro">
+                    <h2>1. SQL Injection</h2>
+                    <div class="info-box">
+                        <p>SQL Injection permite a un atacante manipular consultas SQL para revelar, modificar o eliminar datos. Se mitiga usando consultas parametrizadas/prepared statements, validación de entradas y el principio de menor privilegio en la BD.</p>
+                    </div>
+                </section>
+
+                <section class="card" id="sqli-blind">
+                    <h2>2. Blind SQL Injection</h2>
+                    <div class="info-box">
+                        <p>En blind SQLi el atacante infiere información a través de respuestas booleanas o diferencias en el tiempo de respuesta.</p>
+                    </div>
+                </section>
+
+                <section class="card" id="sqli-timed">
+                    <h2>3. Time-based SQL Injection</h2>
+                    <div class="info-box">
+                        <p>El atacante provoca retrasos en la base de datos y mide el tiempo de respuesta para extraer información.</p>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <script>
+            // Accordion toggle
+            (function(){
+                const accordion = document.getElementById('sidebar-accordion');
+                accordion.querySelectorAll('.accordion-header').forEach(header => {
+                    header.addEventListener('click', () => {
+                        const item = header.parentElement;
+                        item.classList.toggle('open');
+                    });
+                });
+
+                // Search within index
+                const search = document.getElementById('sidebar-search');
+                search.addEventListener('input', function(){
+                    const q = this.value.trim().toLowerCase();
+                    document.querySelectorAll('.accordion-item').forEach(item => {
+                        let anyMatch = false;
+                        item.querySelectorAll('.index-link').forEach(link => {
+                            const text = link.textContent.trim().toLowerCase();
+                            if (!q || text.indexOf(q) !== -1) {
+                                link.style.display = '';
+                                anyMatch = true;
+                            } else {
+                                link.style.display = 'none';
+                            }
+                        });
+                        if (anyMatch) item.classList.add('open'); else item.classList.remove('open');
+                    });
+                });
+            })();
+        </script>
+    </main>
+
+</body>
+</html>
