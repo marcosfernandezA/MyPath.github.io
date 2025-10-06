@@ -1,43 +1,82 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Application Security Hub</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presentación Personal - Marcos</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <div class="sidebar">
-    <h2>Menú</h2>
-    <button onclick="showSection('intro')">Introducción</button>
-    <button onclick="showSection('temas')">¿Qué encontrarás?</button>
-    <button onclick="showSection('nota')">Nota final</button>
-  </div>
-
-  <div class="content">
-    <div id="intro">
-      <h1>Application Security Hub</h1>
-      <p>Hola 👋 Este repositorio sirve como cuaderno de aprendizaje sobre Application Security...</p>
-    </div>
-
-    <div id="temas" style="display:none;">
-      <h2>¿Qué encontrarás?</h2>
-      <ul>
-        <li>Vulnerabilidades web (con PoC y mitigaciones).</li>
-        <li>Buenas prácticas de SSDLC.</li>
-        <li>Seguridad en pipelines CI/CD.</li>
-        <li>Notas sobre diseño seguro.</li>
-      </ul>
-    </div>
-
-    <div id="nota" style="display:none;">
-      <h2>Nota final</h2>
-      <p>El contenido que se suba no tiene porque ser óptimo y puede contener erratas.<br>
-      Mi objetivo no va a ser educar, sino aprender 🙂</p>
-    </div>
-  </div>
-
-  <script src="script.js"></script>
+    <header>
+        <nav class="navbar">
+            <div class="nav-logo">
+                <span class="wave">🛡️</span> Marcos
+            </div>
+            <ul>
+                <li class="dropdown">
+                    <a href="#web-security-index" id="web-security-link"><span>🔒</span> Web Security</a>
+                    <ul class="dropdown-content">
+                        <li><a href="#xss" id="xss-link"><span>🧬</span> XSS</a></li>
+                        <li><a href="#sql-injection" id="sql-injection-link"><span>💾</span> SQL Injection</a></li>
+                    </ul>
+                </li>
+                <li><a href="#devsecops"><span>⚙️</span> DevSecOps</a></li>
+                <li><a href="#design-security"><span>🎨</span> Design and Security</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section id="index" class="card">
+            <div class="profile-header">
+                <img src="profile.jpg" alt="Foto de perfil" class="profile-img">
+                <div>
+                    <h1>¡Hola! Soy Marcos <span class="wave">👋</span></h1>
+                    <div class="subtitle">Apasionado por la seguridad informática y el desarrollo seguro.</div>
+                    <div class="social-media">
+                        <a href="https://twitter.com/tuusuario" target="_blank" title="Twitter"><span>🐦</span></a>
+                        <a href="https://github.com/tuusuario" target="_blank" title="GitHub"><span>🐙</span></a>
+                        <a href="https://linkedin.com/in/tuusuario" target="_blank" title="LinkedIn"><span>💼</span></a>
+                    </div>
+                </div>
+            </div>
+            <div class="info-box">
+                Bienvenido a mi página personal. Explora los apartados de seguridad web, DevSecOps y diseño seguro.
+            </div>
+        </section>
+        <section id="web-security-index" class="card hidden">
+            <h2><span>🔒</span> Web Security</h2>
+            <div class="info-box">Índice de temas sobre seguridad web:</div>
+            <ul class="topic-list">
+                <li><a href="#xss"><span>🧬</span> XSS</a></li>
+                <li><a href="#sql-injection"><span>💾</span> SQL Injection</a></li>
+            </ul>
+        </section>
+        <section id="xss" class="card hidden">
+            <h2><span>🧬</span> XSS (Cross-Site Scripting)</h2>
+            <div class="info-box">
+                XSS es una vulnerabilidad que permite a un atacante inyectar scripts maliciosos en páginas web vistas por otros usuarios. Esto puede llevar al robo de información, manipulación de la página y otros ataques.
+            </div>
+        </section>
+        <section id="sql-injection" class="card hidden">
+            <h2><span>💾</span> SQL Injection</h2>
+            <div class="info-box">
+                SQL Injection es una vulnerabilidad que permite a un atacante manipular las consultas SQL de una aplicación, accediendo o modificando datos de manera no autorizada.
+            </div>
+        </section>
+        <section id="devsecops" class="card hidden">
+            <h2><span>⚙️</span> DevSecOps</h2>
+            <div class="info-box">
+                Integración de la seguridad en el ciclo de vida del desarrollo de software.
+            </div>
+        </section>
+        <section id="design-security" class="card hidden">
+            <h2><span>🎨</span> Design and Security</h2>
+            <div class="info-box">
+                Buenas prácticas de diseño seguro en aplicaciones web.
+            </div>
+        </section>
+    </main>
+    <script src="script.js"></script>
 </body>
 </html>
