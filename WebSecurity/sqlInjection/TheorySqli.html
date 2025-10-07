@@ -71,7 +71,55 @@
                 <section class="card" id="sqli-intro">
                     <h2>1. SQL Injection</h2>
                     <div class="info-box">
-                        <p>SQL Injection permite a un atacante manipular consultas SQL para revelar, modificar o eliminar datos. Se mitiga usando consultas parametrizadas/prepared statements, validación de entradas y el principio de menor privilegio en la BD.</p>
+                        <p>What is SQL injection (SQLi)?
+
+* SQL injection is a web security flaw where an attacker changes the database queries an app sends.
+* If inputs are used directly in SQL, an attacker can make the database run commands the developer did not intend.
+
+Where SQLi can appear (not only WHERE):
+
+* **WHERE clauses** in SELECT/UPDATE queries — the most common place.
+* **UPDATE** statements: in the values being set or in the WHERE clause.
+* **INSERT** statements: inside the inserted values.
+* **SELECT** statements: inside table or column names (if names are built from user input).
+* **ORDER BY** clause: if ordering is built from user input.
+* **Other query parts**: any place where user data is combined into SQL can be dangerous.
+
+Different data formats and contexts
+
+* Inputs can come in JSON, XML, or other formats. These formats can change how you craft an attack.
+* Firewalls and filters (WAFs) often look for keywords. Encoding, escaping, or changing the input format can hide those keywords and sometimes bypass defenses.
+
+Why it is serious
+
+* An attacker can read, change, delete, or add data.
+* Sensitive data at risk includes passwords, credit cards, and personal info.
+* SQLi has caused major data breaches, fines, and long-term compromises.
+
+Example of encoding/escaping to bypass filters (XML)
+
+* Some servers decode XML escapes before putting the text into SQL. Example:
+
+  ```
+  <stockCheck>
+      <productId>123</productId>
+      <storeId>999 &#x53;ELECT * FROM information_schema.tables</storeId>
+  </stockCheck>
+  ```
+
+  * The `&#x53;` is an XML escape for `S`. After decoding, the server might see `SELECT * FROM information_schema.tables`, which then becomes part of the SQL query.
+
+Tips for testers and developers (simple)
+
+* Test all parts of a query, not just WHERE.
+* Don't put raw user input into table names, column names, ORDER BY fields, or SQL strings.
+* Use parameterized queries / prepared statements and strong input validation.
+* Watch for unusual encodings (XML/HTML entities, JSON escapes) that may be decoded server-side.
+
+Short one-line summary:
+
+* SQLi lets attackers change any part of an SQL query (not just WHERE), and inputs in JSON/XML may hide attacks through encoding or escaping.
+</p>
                     </div>
                 </section>
 
