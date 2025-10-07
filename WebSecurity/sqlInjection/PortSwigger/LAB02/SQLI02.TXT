@@ -1,0 +1,9 @@
+Lab: SQL injection attack, querying the database type and version on MySQL and Microsoft
+PRACTITIONER
+
+This lab contains a SQL injection vulnerability in the product category filter. You can use a UNION attack to retrieve the results from an injected query.
+
+To solve the lab, display the database version string.
+iMAge 1 show THE IMPORTANCE OF THE BLANK SPACE AFTER -- BECASUE IT IS A MICROSFOT DB
+Image 2 shows how for microfost databe we don't need to have a from statement in the union clause whereas with oracle we did need it, th end solution retireves 8.0.42-0ubuntu0.20.04.1
+

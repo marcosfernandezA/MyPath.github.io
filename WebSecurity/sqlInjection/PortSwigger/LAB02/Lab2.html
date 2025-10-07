@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PortSwigger SQLi Lab 2</title>
+    <link rel="stylesheet" href="../../../../style.css">
+    <script defer src="../../../../loadHeader.js"></script>
+    <script defer src="../../../../sqliIndex.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function(){
+        if(window.loadHeader) window.loadHeader('global-header');
+      });
+    </script>
+  </head>
+  <body>
+    <header>
+      <div id="global-header"></div>
+    </header>
+    <main>
+      <div class="layout">
+        <aside class="sidebar">
+          <div id="sql-index"></div>
+        </aside>
+
+        <div class="content-area">
+          <section class="card" style="max-width: unset;">
+            <h1>PortSwigger SQLi Lab 2 — MySQL/MSSQL version via UNION</h1>
+            <p>
+              Resumen del laboratorio: "SQL injection attack, querying the database type and version on MySQL and Microsoft".
+              De nuevo, la vulnerabilidad está en el filtro de categorías. Usamos <code>UNION</code> para mostrar la cadena de versión.
+            </p>
+
+            <h2>Notas clave</h2>
+            <ul>
+              <li>En MSSQL, los comentarios con <code>--</code> requieren un espacio tras los guiones: <code>-- </code>.</li>
+              <li>En MySQL/MSSQL no es necesario un <code>FROM</code> en el <code>UNION SELECT</code> simple; a diferencia de Oracle.</li>
+              <li>El objetivo es exponer la versión de la base de datos (por ejemplo, <code>SELECT @@version</code> o equivalente).</li>
+            </ul>
+
+            <h2>Capturas</h2>
+            <figure>
+              <img src="IMAGE1.png" alt="Importancia del espacio tras -- en MSSQL" loading="lazy" style="max-width: 100%; height: auto;" />
+              <figcaption>Imagen 1: Comentario en MSSQL requiere espacio tras <code>--</code>.</figcaption>
+            </figure>
+            <figure>
+              <img src="IMAGE2.png" alt="UNION SELECT sin FROM; resultado de versión" loading="lazy" style="max-width: 100%; height: auto;" />
+              <figcaption>Imagen 2: <code>UNION SELECT</code> sin <code>FROM</code> y versión en la salida.</figcaption>
+            </figure>
+
+            <h2>Conclusiones</h2>
+            <ul>
+              <li>Atajos como comentario <code>-- </code> y <code>UNION</code> sin <code>FROM</code> aceleran la explotación en MySQL/MSSQL.</li>
+              <li>La técnica sigue siendo la misma: casar columnas y volcar la versión en una columna visible.</li>
+            </ul>
+
+            <nav class="lab-nav">
+              <a href="../LAB01/Lab1.html">← Anterior</a>
+              <span></span>
+            </nav>
+          </section>
+        </div>
+      </div>
+
+      <script>
+        document.addEventListener('DOMContentLoaded', function(){
+          (async function(){
+            if(window.loadPartial){
+              await window.loadPartial('sql-index','partials/sqlinjection-index.html');
+              if(window.initSqliIndex) window.initSqliIndex();
+            }
+          })();
+        });
+      </script>
+    </main>
+  </body>
+  </html>

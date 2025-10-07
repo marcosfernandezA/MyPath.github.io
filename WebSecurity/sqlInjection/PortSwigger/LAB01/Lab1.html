@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PortSwigger SQLi Lab 1</title>
+    <link rel="stylesheet" href="../../../../style.css">
+</head>
+<body>
+<header>
+    <div id="global-header"></div>
+    <script src="../../../../loadHeader.js"></script>
+    <script>window.loadHeader && window.loadHeader('global-header');</script>
+    <script src="../../../../sqliIndex.js"></script>
+</header>
+<main>
+    <div class="layout">
+        <aside class="sidebar">
+            <div id="sql-index"></div>
+        </aside>
+
+        <div class="content-area">
+            <section class="card" style="max-width: unset;">
+                <h1>PortSwigger SQLi Lab 1 — Oracle version via UNION</h1>
+                <p>
+                    Resumen del laboratorio: "SQL injection attack, querying the database type and version on Oracle".
+                    La vulnerabilidad está en el filtro de categorías. El objetivo es mostrar la cadena de versión de la base de datos usando un ataque UNION.
+                </p>
+
+                <h2>Notas clave</h2>
+                <ul>
+                    <li>El parámetro del <em>product category filter</em> es vulnerable a SQLi.</li>
+                    <li>Se utiliza un ataque <code>UNION</code> para inyectar una segunda consulta y volcar resultados en la respuesta.</li>
+                    <li>Primero se determina el número de columnas de la consulta original para que el <code>UNION</code> sea válido.</li>
+                    <li>En Oracle, cuando no conoces los tipos exactos, se suelen usar <code>NULL</code> como marcadores hasta casar tipos/columnas.</li>
+                    <li>Objetivo: recuperar la versión de la base de datos (p.ej., desde <code>v$version</code>).</li>
+                </ul>
+
+                <h2>Metodología</h2>
+                <p><strong>1) Comprobar inyección:</strong> probar con un apóstrofo <code>'</code> o una condición booleana para observar errores/comportamientos anómalos.</p>
+                <p><strong>2) Contar columnas:</strong> usar <code>UNION SELECT</code> con distintos números de columnas hasta que no haya error (p.ej. <code>UNION SELECT NULL</code>, luego <code>UNION SELECT NULL,NULL</code>, etc.).</p>
+                <p><strong>3) Emparejar tipos:</strong> si alguna columna muestra datos en la respuesta, colocar allí el valor a exfiltrar.</p>
+                <p><strong>4) Versión en Oracle:</strong> una vez identificado el número/posición de columnas, intentar algo como: <code>UNION SELECT banner, NULL FROM v$version</code> (ajustando el número de columnas con <code>NULL</code> según sea necesario).</p>
+
+                <h2>Capturas</h2>
+                <figure>
+                    <img src="01sqli01.png" alt="Comprobación de vulnerabilidad SQLi" loading="lazy" style="max-width: 100%; height: auto;" />
+                    <figcaption>Imagen 1: El parámetro es vulnerable.</figcaption>
+                </figure>
+                <figure>
+                    <img src="01sqli02.png" alt="Prueba de UNION para contar columnas - parte 1" loading="lazy" style="max-width: 100%; height: auto;" />
+                    <figcaption>Imagen 2: Probando UNION para determinar columnas.</figcaption>
+                </figure>
+                <figure>
+                    <img src="01sqli03.png" alt="Prueba de UNION para contar columnas - parte 2" loading="lazy" style="max-width: 100%; height: auto;" />
+                    <figcaption>Imagen 3: Continuación del conteo de columnas.</figcaption>
+                </figure>
+                <figure>
+                    <img src="01sqli04.png" alt="Consulta final mostrando versión de Oracle" loading="lazy" style="max-width: 100%; height: auto;" />
+                    <figcaption>Imagen 4: Solución final usando NULL para casar columnas.</figcaption>
+                </figure>
+
+                <h2>Conclusiones</h2>
+                <ul>
+                    <li>El ataque UNION requiere igualar número y tipos de columnas; <code>NULL</code> ayuda a casar tipos.</li>
+                    <li>En Oracle, <code>v$version</code> es una fuente común para extraer la cadena de versión.</li>
+                    <li>Validar siempre entradas y usar consultas parametrizadas para mitigar SQLi.</li>
+                </ul>
+                <nav class="lab-nav">
+                    <span></span>
+                    <a href="../LAB02/Lab2.html">Siguiente →</a>
+                </nav>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        (async function(){
+            if(window.loadPartial){
+                await window.loadPartial('sql-index','partials/sqlinjection-index.html');
+                if(window.initSqliIndex) window.initSqliIndex();
+            }
+        })();
+    </script>
+</main>
+</body>
+</html>

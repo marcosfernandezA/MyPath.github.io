@@ -1,0 +1,12 @@
+Lab: SQL injection attack, querying the database type and version on Oracle
+PRACTITIONER
+
+This lab contains a SQL injection vulnerability in the product category filter. You can use a UNION attack to retrieve the results from an injected query.
+
+To solve the lab, display the database version string.
+
+Image 1 represents that it is vulenrable
+
+Image 2-3 represnets that you can use union attac to determine how many columns there are
+
+Image 4 shows the solutions and remarks that you need to add null on the query in order to make it owrk
