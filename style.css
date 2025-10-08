@@ -39,7 +39,7 @@ header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    max-width: 900px;
+    max-width: 1200px; /* allow more room to keep items on one line */
     margin: 0 auto;
     padding: 0 24px;
     background: transparent; /* removed navbar background */
@@ -49,14 +49,25 @@ header {
     /* Shared navbar adjustments: ensure consistent padding and background inheritance */
     box-sizing: border-box;
 }
+
+/* Header brand title */
 .nav-logo {
-    font-size: 1.6rem;
+    font-size: 2.06rem;
     font-weight: 700;
     display: flex;
     align-items: center;
     gap: 8px;
-    color: #fff;
+    color: #6353EE; /* brand blue for title */
+    text-shadow: 0 0 8px rgba(99,62,238,0.55), 0 0 18px rgba(99,62,238,0.35);
 }
+
+.nav-logo:hover {
+  color: #7a6bff;
+  transform: scale(1.05);
+  border-color: transparent;
+  box-shadow: none;
+}
+
 .navbar ul {
     list-style: none;
     margin: 0;
@@ -71,22 +82,26 @@ header {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 12px 20px;
+    padding: 12px 24px; /* slightly longer buttons */
     color: #fff;
     text-decoration: none;
     border-radius: 6px;
-    font-size: 1.08rem; /* slightly larger */
+    font-size: 1rem; /* standard size for nav items */
     font-weight: 600;   /* bolder for readability */
-    border: 1px solid transparent; /* prevent layout shift when hovering */
+    border: 1px solid transparent; /* keep layout stable */
     transition: background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+    white-space: nowrap; /* keep text on one line */
 }
 .navbar a:hover {
-    background: transparent; /* keep transparent, no fill */
+    background: transparent;
     color: #fff;
-    border-color: rgba(99,62,238,0.75); /* neon-like border */
-    box-shadow: 0 0 0 2px rgba(99,62,238,0.25) inset,
-                0 6px 24px rgba(83,83,236,0.35); /* soft outer glow */
+    border-color: rgba(99,62,238,0.75);
+    box-shadow: 0 0 0 2px rgba(99,62,238,0.25) inset, 0 6px 24px rgba(83,83,236,0.35);
 }
+
+/* Brand link overrides: blue by default, scale on hover, no neon border */
+.navbar a.nav-logo { color: #6353EE; border-color: transparent; box-shadow: none; transition: color .2s, transform .15s ease; font-size: 2.08rem; text-shadow: 0 0 8px rgba(99,62,238,0.55), 0 0 18px rgba(99,62,238,0.35); white-space: nowrap; padding: 12px 26px; }
+.navbar a.nav-logo:hover { color: #7a6bff; transform: scale(1.05); border-color: transparent; box-shadow: none;     text-shadow: 0 0 10px rgba(122,107,255,0.7), 0 0 24px rgba(99,62,238,0.45);\n}\n
 .navbar a:focus-visible { outline: 2px solid #ffffffcc; outline-offset: 3px; }
 .dropdown .dropdown-content {
     /* hidden by default; use !important to prevent accidental overrides */
@@ -217,9 +232,6 @@ section {
         flex-direction: column;
         height: auto;
         padding: 0 8px;
-    }
-    .nav-logo {
-        margin-bottom: 8px;
     }
     .navbar ul {
         flex-direction: column;
@@ -479,6 +491,13 @@ section[id] { scroll-margin-top: 100px; }
     backdrop-filter: blur(6px);
     transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
 }
+.ws-box h2,
+.ws-box h3 {
+    color: #6353EE; /* neon-ish blue to match header hover */
+    text-shadow: 0 0 10px rgba(99,62,238,0.35);
+    margin: 0 0 6px 0;
+}
+.ws-box p { margin: 0; color: #e9e9f2; }
 .ws-box:hover { transform: translateY(-2px); border-color: rgba(99,62,238,0.6); box-shadow: 0 8px 30px rgba(83,83,236,0.22); }
 
 /* Positions as requested */
@@ -492,3 +511,6 @@ section[id] { scroll-margin-top: 100px; }
   .ws-grid { grid-template-columns: 1fr; grid-template-rows: none; }
   .ws-grid .div2, .ws-grid .div3, .ws-grid .div4, .ws-grid .div5, .ws-grid .div6 { grid-column: auto; grid-row: auto; }
 }
+
+
+
