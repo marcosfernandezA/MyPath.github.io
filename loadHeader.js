@@ -14,6 +14,7 @@
         container.innerHTML = text;
         // If a global initializer exists, call it
         if(window.initGlobalNav) try{ window.initGlobalNav(); }catch(e){}
+        ensureBackgroundLayer();
         loaded = true;
         break;
       }catch(e){ /* try next */ }
@@ -23,6 +24,15 @@
       container.innerHTML = '<nav class="navbar global-nav"><a href="index.html" class="nav-logo">AppSec</a></nav>';
       if(window.initGlobalNav) try{ window.initGlobalNav(); }catch(e){}
     }
+  }
+
+  // Ensure the site-wide gradient background layer exists
+  function ensureBackgroundLayer(){
+    if(document.getElementById('site-bg-ellipse')) return;
+    const bg = document.createElement('div');
+    bg.id = 'site-bg-ellipse';
+    bg.className = 'bg-ellipse-hero';
+    document.body.prepend(bg);
   }
 
   // Generic partial loader with prefix probing and {{PREFIX}} replacement

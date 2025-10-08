@@ -1,0 +1,27 @@
+Cómo prevenir SQL Injection & prevenir blind SQLi
+
+Buenas prácticas (en orden de prioridad):
+
+1. Consultas parametrizadas / Prepared Statements (bind parameters).
+
+Ejemplo en PHP (PDO):
+
+$pdo->prepare('SELECT * FROM users WHERE id = ?');
+$stmt->execute([$id]);
+
+2. ORMs que generen consultas parametrizadas automáticamente (aunque no son garantía si usas raw queries).
+3. Validación y normalización de entrada. Whitelisting (tipos, longitudes, rangos) antes de usar datos en SQL.
+4. Escapar correctamente cuando no hay prepared statements (evitar esto si es posible). Use las funciones específicas del driver.
+5. Principio de mínimo privilegio: la cuenta de BD usada por la web debe tener sólo los permisos necesarios (no DROP, no ALTER, etc.).
+6. Evitar mensajes de error detallados en producción. No exponer stack traces ni mensajes SQL al usuario.
+7. Uso de WAF como defensa en profundidad — no lo uses como única defensa.
+8. Registro y monitorización de consultas anómalas, alertas por patrones de inyección.
+9. Cifrado de datos sensibles en reposo y en tránsito; proteger credenciales con hashing (bcrypt/argon2 para passwords).
+
+Prevenir Blind SQLi específicamente
+
+• Las medidas anteriores mitigan blind SQLi (parametrización/escapado).
+• Evita mostrar diferencias pequeñas entre respuestas que permitan inferencia (por ejemplo, no devolver contenido distinto ante errores o condiciones internas).
+• Limitar tiempos máximos de respuesta y proteger la función SLEEP del motor si es posible (no siempre aplicable).
+
+---

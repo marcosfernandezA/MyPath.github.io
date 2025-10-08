@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web Security</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <header>
+    <div id="global-header"></div>
+  </header>
+
+  <main>
+    <div class="ws-grid">
+      <!-- Header ocupa visualmente la primera fila; ya está arriba con position: sticky -->
+      <a class="div2 ws-box" href="#" aria-disabled="true" onclick="return false;">
+        <h2>Web Security</h2>
+        <p>Fundamentos, vulnerabilidades comunes y prácticas para reducir la superficie de ataque.</p>
+      </a>
+
+      <a class="div3 ws-box" href="./sqlInjection/TheorySqli.html">
+        <h3>SQL Injection</h3>
+        <p>Inyección tradicional, ataques UNION y técnicas Blind. Guías, labs y mitigación.</p>
+      </a>
+
+      <a class="div4 ws-box" href="./xss/TheoryXSS.html">
+        <h3>XSS</h3>
+        <p>Reflected y Stored XSS, payloads y defensas (encode output, CSP).</p>
+      </a>
+
+      <div class="div5 ws-box"></div>
+      <div class="div6 ws-box"></div>
+    </div>
+  </main>
+
+  <script src="../loadHeader.js"></script>
+  <script>
+    (async function(){
+      if(window.loadHeader){ await window.loadHeader('global-header'); }
+    })();
+  </script>
+</body>
+</html>

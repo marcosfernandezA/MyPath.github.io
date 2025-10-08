@@ -1,0 +1,53 @@
+
+
+Blind SQL Injection
+
+¿Qué es?
+
+Cuando la aplicación NO devuelve datos SQL directamente (sin errores visibles ni UNIONs), pero sí refleja cambios en la respuesta según condiciones booleanas o temporales. El atacante infiere información bit a bit.
+
+1. Respuestas condicionales (Boolean-based)
+
+Principio: enviar consultas que evalúen a TRUE o FALSE y observar diferencias en la página (contenido, código HTTP, longitud, comportamiento de JavaScript).
+
+Ejemplo (boolean-based):
+
+?id=1 AND (SELECT SUBSTRING(password,1,1) FROM users WHERE username='admin')='a'--
+
+Si la página cambia (por ejemplo muestra el producto correctamente sólo cuando la condición es verdadera), entonces sabemos que la primera letra de la contraseña es a.
+
+Automatización: herramientas como sqlmap o BurpIntruder con payloads recursivos.
+
+2. Error-based SQLi
+
+Provocar errores que devuelvan datos en el mensaje de error. Ejemplo MySQL:
+
+1' AND (SELECT 1 FROM (SELECT COUNT(*), CONCAT((SELECT database()),0x3a,FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x) a)--
+
+(Esto fuerza un error de agrupamiento que a veces revela datos en el mensaje).
+
+Los errores dependen del nivel de debug de la aplicación y del motor.
+
+3. Time-based (delays)
+
+Cuando no hay diferencias visibles en contenido, medir tiempo de respuesta.
+
+MySQL: SLEEP(5)
+
+?id=1' AND IF(SUBSTRING((SELECT password FROM users WHERE username='admin'),1,1)='a', SLEEP(5), 0)--
+
+Si la respuesta tarda ~5s, la condición es verdadera.
+
+PostgreSQL: pg_sleep(5)
+MSSQL: WAITFOR DELAY '0:0:5'
+
+4. Out-of-band (OAST)
+
+Usar funciones del motor que provoquen solicitudes HTTP/DNS a un servidor controlado por el atacante para exfiltrar datos.
+
+• MySQL LOAD_FILE() no hace callbacks, pero en algunos motores o extensiones puedes usar funciones que llamen a la red.
+• Usar xp_dirtree/xp_fileexist en MSSQL combinado con UNC paths (\attacker.com\share) para generar DNS lookups.
+
+Requiere que el servidor de base de datos pueda resolver nombres y que exista un canal de red para las peticiones salientes.
+
+---

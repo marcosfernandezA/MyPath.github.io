@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQLi - UNION Attacks</title>
+  <link rel="stylesheet" href="../../../style.css">
+  <script src="../../../loadHeader.js"></script>
+  <script src="../../../sqliIndex.js"></script>
+</head>
+<body>
+  <header>
+    <div id="global-header"></div>
+  </header>
+  <main>
+    <div class="layout">
+      <aside class="sidebar">
+        <div id="sql-index"></div>
+      </aside>
+      <div class="content-area">
+        <section class="card">
+          <h2>3. SQL Injection - ataques UNION</h2>
+          <pre id="section-content"></pre>
+        </section>
+      </div>
+    </div>
+    <script>
+      (async function(){
+        if(window.loadHeader){ await window.loadHeader('global-header'); }
+        if(window.loadPartial){
+          await window.loadPartial('sql-index','partials/sqlinjection-index.html');
+          if(window.initSqliIndex) window.initSqliIndex();
+        }
+        const target = document.getElementById('section-content');
+        try{
+          const res = await fetch('./03-SQLInjectionUnion.txt', {cache:'no-store'});
+          target.textContent = res.ok ? (await res.text()) : 'No se pudo cargar el contenido.';
+        }catch(e){ target.textContent = 'Error cargando el contenido.'; }
+      })();
+    </script>
+  </main>
+</body>
+</html>

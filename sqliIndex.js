@@ -39,6 +39,16 @@
       localStorage.setItem(OPEN_STATE_KEY, JSON.stringify(keys));
     }
 
+    // Subindex toggles (e.g., Cheat sheet)
+    accordion.querySelectorAll('.sub-toggle').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const li = btn.closest('li');
+        const open = li.classList.toggle('open');
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+    });
+
     // Search within index
     const search = document.getElementById('sidebar-search');
     if(search){
@@ -71,8 +81,6 @@
   }
 
   function setupScrollspy(accordion){
-    const sections = Array.from(document.querySelectorAll('section[id]'));
-    if(sections.length === 0) return;
     const links = Array.from(accordion.querySelectorAll('a.index-link'))
       .filter(a => {
         try {
@@ -80,22 +88,59 @@
           return u.pathname === location.pathname && u.hash;
         } catch(e){ return false; }
       });
+    if(links.length === 0) return;
 
-    const map = new Map(); // id -> link
-    links.forEach(a => { map.set(new URL(a.href, location.href).hash.slice(1), a); });
-
-    function onScroll(){
-      let currentId = null;
-      const y = window.scrollY + 120; // offset for header
-      for(const sec of sections){
-        const top = sec.offsetTop;
-        if(top <= y) currentId = sec.id; else break;
+    const targets = [];
+    const idToLink = new Map();
+    links.forEach(a => {
+      const id = new URL(a.href, location.href).hash.slice(1);
+      const el = document.getElementById(id);
+      if(el){
+        targets.push(el);
+        idToLink.set(id, a);
       }
+    });
+    if(targets.length === 0) return;
+
+    // Mark active on click to reduce mismatch
+    links.forEach(a => {
+      a.addEventListener('click', (e) => {
+        const id = new URL(a.href, location.href).hash.slice(1);
+        const el = document.getElementById(id);
+        if(el){
+          e.preventDefault();
+          const y = el.getBoundingClientRect().top + window.scrollY - 100; // header offset
+          window.scrollTo({ top: y, behavior: 'smooth' });
+          setActive(id);
+          // close drawer on mobile
+          const sidebar = document.querySelector('.sidebar');
+          const overlay = document.querySelector('.drawer-overlay');
+          if(sidebar) sidebar.classList.remove('open');
+          if(overlay) overlay.classList.remove('open');
+        }
+      });
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+      // Pick the entry closest to viewport top and sufficiently visible
+      let best = null;
+      entries.forEach(en => {
+        if(en.isIntersecting){
+          const rectTop = en.target.getBoundingClientRect().top;
+          const score = Math.max(0, 1 - Math.abs(rectTop - 110) / 400); // prefer near 110px from top
+          if(!best || score > best.score){ best = { id: en.target.id, score }; }
+        }
+      });
+      if(best) setActive(best.id);
+    }, { root: null, rootMargin: '-120px 0px -55% 0px', threshold: [0, 0.25, 0.5, 0.75, 1] });
+
+    targets.forEach(t => observer.observe(t));
+
+    function setActive(id){
       links.forEach(l => l.classList.remove('active'));
-      if(currentId && map.has(currentId)) map.get(currentId).classList.add('active');
+      const link = idToLink.get(id);
+      if(link) link.classList.add('active');
     }
-    window.addEventListener('scroll', onScroll, {passive:true});
-    onScroll();
   }
 
   function setupDrawer(){

