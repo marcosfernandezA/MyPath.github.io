@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DevSecOps</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <header>
+    <div id="global-header"></div>
+  </header>
+
+  <main>
+    <div class="ds-grid">
+      <a class="d2 ws-box" href="#" aria-disabled="true" onclick="return false;">
+        <h2>DevSecOps</h2>
+        <p>Integración de seguridad en el ciclo de vida del software: prácticas, automatización y cultura.</p>
+      </a>
+
+      <a class="d3 ws-box" href="./AZ-400/">
+        <h3>AZ-400</h3>
+        <p>Diseño e implementación de DevOps en Azure. Recursos y teoría.</p>
+      </a>
+
+      <a class="d4 ws-box" href="./AZ-400/AZ-104/">
+        <h3>AZ-104</h3>
+        <p>Fundamentos de administración de Azure. Resúmenes y notas.</p>
+      </a>
+
+      <div class="d5 ws-box"></div>
+      <div class="d6 ws-box"></div>
+    </div>
+  </main>
+
+  <script src="../loadHeader.js"></script>
+  <script>
+    (async function(){
+      if(window.loadHeader){ await window.loadHeader('global-header'); }
+    })();
+  </script>
+</body>
+</html>
+

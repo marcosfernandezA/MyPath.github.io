@@ -1,0 +1,96 @@
+Reglas de conversión TXT → HTML (versión AZ-400)
+
+Objetivo
+- Convertir un archivo .txt con estructura semántica simple en HTML legible y estilado, manteniendo heurísticas coherentes con la página AZ-400.
+
+Encabezados numerados
+- Patrón: líneas que empiezan por un número y un punto, con posibles subniveles: 1. / 1.1. / 1.1.1.
+- Regex: ^(\d+(?:\.\d+)*)\.\s+(.+)$
+- Mapeo a HTML:
+  - 1. → <h2>
+  - 1.1. → <h3>
+  - 1.1.1. (y más niveles) → <h4> (o mayor si se desea)
+- El texto del título se conserva tras el número (se muestra “1. Título …”).
+
+Líneas que terminan en “:” (etiquetas)
+- No se convierten en encabezados: se renderizan como <p> (párrafo) manteniendo los “:”.
+- Actúan como “etiquetas” que abren una lista de ítems debajo (véase Listas).
+- Casos especiales: “Ejemplo de uso:” no abre lista; inicia bloque de código (ver Código / comandos).
+
+Listas
+- Viñetas explícitas:
+  - Líneas que empiezan por “- ” o “* ” → <li> (se elimina el marcador de texto).
+- Listas tras etiqueta (líneas acabadas en “:”):
+  - Tras una etiqueta se abre una lista implícita y cada línea siguiente (no vacía) se convierte en <li>.
+  - Esta lista implícita se mantiene incluso si hay líneas en blanco entre ítems.
+  - La lista se cierra automáticamente cuando aparece cualquiera de estos bloques:
+    - Un nuevo encabezado numerado (p. ej., 2. / 2.1. …)
+    - Otra etiqueta que termine en “:”
+    - Una fila de tabla (línea con tabuladores)
+    - Una línea detectada como comando/código
+
+Tablas (celdas separadas por tabulador)
+- Patrón: una línea con al menos un tabulador → fila de tabla.
+- La primera fila encontrada se usa como encabezado (<thead>); las siguientes van a <tbody>.
+- Cada celda se escapa (HTML-escape) y se linkifica.
+
+Código / comandos
+- Bloque “Ejemplo de uso:” → abre <pre><code> y captura líneas hasta encontrar un bloque distinto (línea vacía cierra el párrafo, pero no el pre; el pre se cierra cuando cambie de bloque por reglas generales).
+- Líneas que “parecen” comandos se tratan como código (se agrupan en <pre><code>):
+  - Empiezan por: git | az | bash | pwsh | curl | wget | npm | yarn | pnpm (case-insensitive)
+
+Enlaces
+- Cualquier URL tipo http(s)://… o www.… se convierte en <a href target="_blank" rel="noopener">…</a>.
+
+Párrafos
+- Líneas normales se unen en un mismo <p> mientras no haya separación por línea en blanco o cambio de bloque (encabezado, etiqueta, tabla o código).
+- Se escapa HTML y se linkifican URLs.
+
+Espacios en blanco
+- Líneas en blanco cierran párrafos.
+- En listas implícitas (tras etiqueta “:”) las líneas en blanco NO cierran la lista; simplemente separan ítems visualmente.
+
+Índice lateral (opcional, usado en AZ-400)
+- Se genera dinámicamente a partir de los encabezados H2 y H3/H4 ya convertidos.
+- Solo se listan los H3 numerados con patrón X.X. (regex: ^\d+\.\d+\.) para evitar ruido.
+- Interacción (AZ-400):
+  - Clic en el texto del H2 (cabecera del acordeón) navega al H2.
+  - Botón con triángulo ▸/▾ despliega/contrae las secciones sin navegar.
+  - Enlaces a H3 hacen scroll suave con margen para header fijo.
+  - Se resalta el enlace activo según el scroll.
+
+Accesibilidad y scroll
+- Se utiliza scroll-margin-top en h2/h3/h4 para que el anclaje no quede oculto bajo el header fijo.
+- Se usa backdrop-filter + gradiente translúcido en header global para mantener legibilidad del contenido bajo el header.
+
+Seguridad de HTML
+- Todo el texto se escapa (caracteres: & < > " ').
+- Las URLs se validan superficialmente por patrón; no se ejecuta HTML arbitrario.
+
+Resumen de prioridades
+1) Encabezados numerados → h2/h3/h4 (estructura principal)
+2) Etiquetas “:” → párrafos, abren lista implícita (salvo “Ejemplo de uso:”)
+3) Viñetas “- ” o “* ” → <li>
+4) Tablas por tabuladores → <table>
+5) Comandos → <pre><code>
+6) Párrafos: concatenación de líneas normales
+7) Linkificar URLs y escapar HTML en todo momento
+
+Notas de estilo (no obligatorias en la conversión)
+- En AZ-400 se usa escala de azules: h2 (eléctrico), h3 (azul medio), h4 (suave). Las etiquetas “:” se muestran como párrafos normales.
+- El índice muestra solo X.X para claridad.
+
+Ejemplo mínimo
+  1. Título
+  
+  1.1. Subtítulo
+  
+  Principios fundamentales:
+  Visualizar el trabajo.
+  Limitar el trabajo en progreso (WIP).
+  
+  Ejemplo de uso:
+  git clone https://ejemplo.com/repo.git
+  
+→ Se convierte en <h2>, <h3>, <p> (con “Principios fundamentales:”), lista de <li>, y un <pre><code> con el comando.
+

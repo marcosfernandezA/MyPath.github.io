@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AZ-400 - Teoría</title>
+  <link rel="stylesheet" href="../../style.css">
+  <script src="../../loadHeader.js"></script>
+  <style>
+    /* Minimal table styling for readability */
+    .card table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+    .card th, .card td { border: 1px solid #eef2ff; padding: 8px 10px; text-align: left; }
+    .card thead th { background: #f6f7ff; }
+    .muted { color: #a5b4fc; font-weight: 600; }
+    /* Remove reserved left margin when no sidebar is present */
+    @media (min-width: 901px){
+      .layout.no-sidebar .content-area { margin-left: 0 !important; }
+    }
+
+    /* Center the content area and widen the reading card */
+    .layout.no-sidebar { justify-content: center; }
+    .content-area { display: flex; justify-content: center; width: 100%; }
+
+    /* Page-scoped, softer card on dark background */
+    .az-card {
+      background: rgba(24, 24, 27, 0.74); /* neutral gray translucent */
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      border: 1px solid rgba(122,107,255,0.22); /* blue accent border */
+      box-shadow:
+        0 10px 36px rgba(0,0,0,0.35), /* neutral depth */
+        0 8px 26px rgba(122,107,255,0.18), /* blue glow */
+        inset 0 0 0 1px rgba(255,255,255,0.03);
+      color: #f5f7ff; /* lighter text */
+      max-width: 1200px; /* slightly narrower reading area */
+      padding: 42px 36px; /* more breathing room */
+    }
+
+    /* Typography adjustments for readability */
+    .az-card p { font-size: 1.14rem; line-height: 1.85; color: #f5f7ff; text-align: justify; text-justify: inter-word; hyphens: auto; margin: 0 0 18px 0; }
+    .az-card ul { margin: 0 0 18px 22px; }
+    .az-card li { font-size: 1.12rem; line-height: 1.78; color: #f5f7ff; margin: 6px 0; }
+    /* Hierarchy with inverted blue scale */
+    .az-card h2 { font-size: 2.15rem; color: #7a6bff; margin: 6px 0 18px 0; }
+    .az-card h3 { font-size: 1.5rem; color: #a5b4fc; margin: 26px 0 12px 0; }
+    .az-card h4 { font-size: 1.18rem; color: #c7d2fe; margin: 18px 0 10px 0; }
+
+    /* Links on dark card */
+    .az-card a { color: #d6e5ff; text-decoration: none; border-bottom: 1px dashed rgba(214,229,255,0.45); }
+    .az-card a:hover { color: #eaf2ff; border-bottom-color: rgba(234,242,255,0.75); }
+
+    /* Tables adapted to dark card */
+    .az-card table { border-color: rgba(99,62,238,0.25); }
+    .az-card th, .az-card td { border-color: rgba(99,62,238,0.25); color: #f2f6ff; }
+    .az-card thead th { background: rgba(83,83,236,0.12); color: #f5f7ff; }
+    .az-card tbody tr:nth-child(odd) { background: rgba(255,255,255,0.02); }
+
+    /* Code blocks keep dark theme but breathe a bit more */
+    .az-card pre { background: #0b1022; color: #f5f7ff; padding: 18px; border-radius: 12px; margin: 0 0 20px 0; }
+    .az-card table { margin-bottom: 20px; }
+
+    /* Sidebar theming to match dark background */
+    .layout .sidebar {
+      background: rgba(24, 24, 27, 0.78); /* neutral gray translucent */
+      color: #e5e7eb;
+      border: 1px solid rgba(122,107,255,0.20); /* blue accent border */
+      box-shadow:
+        0 8px 28px rgba(0,0,0,0.30), /* neutral depth */
+        0 6px 22px rgba(122,107,255,0.16), /* blue glow */
+        inset 0 0 0 1px rgba(255,255,255,0.03);
+    }
+    .layout .sidebar h3 { color: #dbe4ff; }
+    /* Match content heading scale: H2 (accordion headers) = electric blue, H3 links = bluish white */
+    .accordion-header { color: #7a6bff; }
+    .accordion-header .idx-jump {
+      background: rgba(122,107,255,0.14);
+      color: #e3e8ff;
+      border: 1px solid rgba(122,107,255,0.28);
+      border-radius: 8px;
+      padding: 4px 8px;
+      font-size: 0.78rem;
+      cursor: pointer;
+    }
+    .accordion-header .idx-jump:hover {
+      background: rgba(122,107,255,0.22);
+      color: #ffffff;
+      border-color: rgba(122,107,255,0.38);
+    }
+    .accordion-content li a.index-link { color: #a5b4fc; }
+    .accordion-content li a.index-link:hover { background: rgba(122,107,255,0.12); color: #f5f7ff; }
+    .accordion-content li a.index-link.active { background: rgba(122,107,255,0.20); color: #ffffff; }
+    .muted { color: #e3e8ff; font-weight: 600; margin: 16px 0 8px 0; }
+    /* Widen container just for this page */
+    .layout.az-wide { --layout-max: 1600px; }
+
+    /* Extra breathing space between major sections (1., 2., 3., ...) */
+    #az400-content h2 { margin: 58px 0 18px 0; }
+    #az400-content h2:first-child { margin-top: 0; }
+    /* Improve anchor positioning when navigating via index */
+    #az400-content h2, #az400-content h3, #az400-content h4 { scroll-margin-top: 96px; }
+
+    /* Page-only frosted transparent header across full header area */
+    header {
+      background: linear-gradient(to bottom, rgba(24,24,27,0.64), rgba(24,24,27,0.32));
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(122,107,255,0.22);
+    }
+    /* Keep inner navbar transparent to avoid double backgrounds */
+    header .navbar { background: transparent !important; border-bottom: none !important; }
+  </style>
+  <script>
+    function escapeHtml(str){
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function linkify(text){
+      const urlRe = /(https?:\/\/[\w\-\.\/%#?=&+~:@,;!()]+)|((?:www)\.[\w\-\.]+\.[a-z]{2,}(?:\/[\w\-\.\/%#?=&+~:@,;!()]*)?)/gi;
+      return text.replace(urlRe, (m) => {
+        const url = m.startsWith('http') ? m : `https://${m}`;
+        return `<a href="${url}" target="_blank" rel="noopener">${m}</a>`;
+      });
+    }
+
+    function transformToHtml(text){
+      const lines = text.replace(/\r\n?/g, '\n').split('\n');
+      let html = '';
+      let inList = false;
+      let listAfterLabel = false; // open list after a label ending with ':'
+      let inPre = false;
+      let inTable = false;
+      let tableHasHeader = false;
+      let pendingParagraph = '';
+
+      function closeParagraph(){
+        if(pendingParagraph.trim()){
+          html += `<p>${linkify(escapeHtml(pendingParagraph.trim()))}</p>`;
+          pendingParagraph = '';
+        }
+      }
+      function closeList(){ if(inList){ html += '</ul>'; inList = false; } listAfterLabel = false; }
+      function openList(){ if(!inList){ html += '<ul>'; inList = true; } }
+      function closePre(){ if(inPre){ html += '</code></pre>'; inPre = false; } }
+      function openPre(){ if(!inPre){ html += '<pre><code>'; inPre = true; } }
+      function closeTable(){ if(inTable){ html += (tableHasHeader ? '</tbody></table>' : '</table>'); inTable = false; tableHasHeader = false; } }
+
+      const headingRe = /^(\d+(?:\.\d+)*)\.\s+(.+)$/;
+      const tableRowRe = /^(.+)\t(.+)$/; // rows separated by tabs
+
+      for(let i=0;i<lines.length;i++){
+        const raw = lines[i];
+        const line = raw.trim();
+
+        // Blank line: close paragraph and possibly end blocks (list ends only if we were in a list after label and next is blank)
+        if(line === ''){
+          // Keep lists open across blank lines when following a label
+          if(listAfterLabel){
+            closeParagraph();
+            continue;
+          }
+          closeParagraph();
+          if(inPre){ html += '\n'; }
+          else { closeList(); closeTable(); }
+          continue;
+        }
+
+        // Headings like 1. , 1.1. , 1.1.1.
+        const hMatch = line.match(headingRe);
+        if(hMatch){
+          closeParagraph(); closeList(); closePre(); closeTable();
+          const levelCount = hMatch[1].split('.').length; // 1 -> h2, 2 -> h3, 3+ -> h4/h5
+          const tag = levelCount === 1 ? 'h2' : (levelCount === 2 ? 'h3' : (levelCount === 3 ? 'h4' : 'h5'));
+          html += `<${tag}>${escapeHtml(hMatch[1] + '. ' + hMatch[2])}</${tag}>`;
+          continue;
+        }
+
+        // Override: lines ending with ':' are paragraphs (not headings)
+        if(/:$/u.test(line)){
+          // Ensure any previous list is closed so the new label is not indented
+          closeParagraph(); closeList(); closePre(); closeTable();
+          const label = line.replace(/:$/,'').trim();
+          html += `<p>${linkify(escapeHtml(line))}</p>`;
+          // After such labels we keep collecting list items until a new block starts
+          listAfterLabel = true;
+          // Special case: example blocks
+          if(/^Ejemplo de uso$/i.test(label)){
+            listAfterLabel = false;
+            openPre();
+          }
+          continue;
+        }
+        // Labeled sections ending with ':' become small headings
+        if(/:$/u.test(line)){
+          closeParagraph(); closeList(); closePre(); closeTable();
+          const label = line.replace(/:$/,'').trim();
+          html += `<h4 class="muted">${escapeHtml(label)}</h4>`;
+          // After labels (e.g., Ventajas, Desventajas, Usos, Principios, Objetivos) we typically list items
+          listAfterLabel = true;
+          // Exception: if it's an example block, open <pre>
+          if(/^Ejemplo de uso$/i.test(label)){
+            listAfterLabel = false;
+            openPre();
+          }
+          continue;
+        }
+
+        // Table rows with tab separator
+        const tMatch = raw.match(tableRowRe);
+        if(tMatch){
+          closeParagraph(); closeList(); closePre();
+          if(!inTable){
+            // first row might be header
+            inTable = true;
+            tableHasHeader = false; // decide on first row
+            // Peek previous non-empty to see if this is likely header (look for keywords)
+          }
+          if(!tableHasHeader){
+            html += '<table><thead><tr>' + tMatch.slice(1).map(c=>`<th>${escapeHtml(c.trim())}</th>`).join('') + '</tr></thead><tbody>';
+            tableHasHeader = true;
+          } else {
+            html += '<tr>' + tMatch.slice(1).map(c=>`<td>${linkify(escapeHtml(c.trim()))}</td>`).join('') + '</tr>';
+          }
+          continue;
+        }
+
+        // If in a preformatted example block, keep adding lines
+        if(inPre){
+          html += escapeHtml(raw) + '\n';
+          continue;
+        }
+
+        // Support explicit bullets ("- " or "* ") anywhere
+        if(/^[-*]\s+/.test(line)){
+          closeParagraph(); closeTable();
+          openList();
+          html += `<li>${linkify(escapeHtml(line.replace(/^[-*]\s+/, '')))}</li>`;
+          continue;
+        }
+
+        // If previous label suggested a list, convert subsequent lines into <li>
+        if(listAfterLabel){
+          // Stop list if a new heading/label/table/code starts
+          if(headingRe.test(line) || /:$/u.test(line) || tableRowRe.test(raw) || /^(git |az |bash |pwsh |curl |wget |npm |yarn |pnpm )/i.test(line)){
+            closeList();
+            // reprocess this line in next iteration
+            i--; listAfterLabel = false; continue;
+          }
+          openList();
+          html += `<li>${linkify(escapeHtml(line))}</li>`;
+          continue;
+        }
+
+        // Simple heuristic: lines that look like shell/git commands → code block
+        if(/^(git |az |bash |pwsh |curl |wget |npm |yarn |pnpm )/i.test(line)){
+          closeParagraph(); closeList(); closeTable();
+          openPre();
+          html += escapeHtml(raw) + '\n';
+          continue;
+        }
+
+        // Default: paragraph (combine consecutive lines)
+        if(pendingParagraph){ pendingParagraph += ' ' + raw.trim(); }
+        else { pendingParagraph = raw; }
+      }
+
+      // Close any open blocks
+      closeParagraph(); closeList(); closePre(); closeTable();
+      return html;
+    }
+
+    function slugify(text){
+      return text.toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+        .replace(/[^a-z0-9\s.-]/g,'')
+        .trim().replace(/[\s]+/g,'-');
+    }
+
+    function buildIndex(){
+      const container = document.getElementById('az400-content');
+      const headings = container.querySelectorAll('h2, h3, h4');
+      const indexRoot = document.getElementById('az-index');
+      if(!headings.length || !indexRoot) return;
+
+      // assign unique ids and gather structure
+      const seen = new Map();
+      const items = [];
+      headings.forEach(h => {
+        const level = h.tagName === 'H2' ? 2 : (h.tagName === 'H3' ? 3 : 4);
+        const text = h.textContent.trim();
+        let base = slugify(text);
+        let id = base;
+        let i = 2;
+        while(seen.has(id)){ id = `${base}-${i++}`; }
+        seen.set(id, true);
+        h.id = id;
+        items.push({ level, text, id });
+      });
+
+      // Build an accordion per H2 with nested H3/H4
+      const accord = document.createElement('div');
+      accord.className = 'accordion';
+      let currentItem = null;
+      let currentList = null;
+      function scrollToHeading(targetId){
+        const el = document.getElementById(targetId);
+        if(!el) return;
+        const headerH = 68; // approximate sticky header height
+        const y = el.getBoundingClientRect().top + window.scrollY - headerH - 12;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      }
+
+      items.forEach(it => {
+        if(it.level === 2){
+          currentItem = document.createElement('div');
+          currentItem.className = 'accordion-item';
+          const header = document.createElement('div');
+          header.className = 'accordion-header';
+          header.tabIndex = 0;
+          header.innerHTML = `<span>${it.text}</span><button class="idx-jump" title="Ir a sección" aria-label="Ir a sección">↗</button>`;
+          const itemEl = currentItem;
+          const id = it.id;
+          function toggleOnly(){ itemEl.classList.toggle('open'); }
+          // Click on header text navigates to the section
+          header.addEventListener('click', (e) => { scrollToHeading(id); });
+          header.addEventListener('keydown', (e) => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); scrollToHeading(id); }});
+          // Click on the arrow toggles open/close without navigating
+          const jumpBtn = header.querySelector('.idx-jump');
+          if(jumpBtn){
+            jumpBtn.addEventListener('click', (e)=>{ e.stopPropagation(); toggleOnly(); });
+            jumpBtn.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); e.stopPropagation(); toggleOnly(); }});
+          }
+          const content = document.createElement('div');
+          content.className = 'accordion-content';
+          currentList = document.createElement('ul');
+          content.appendChild(currentList);
+          currentItem.appendChild(header);
+          currentItem.appendChild(content);
+          accord.appendChild(currentItem);
+        } else if(currentList){
+          // Only include X.X numbered subsections (e.g., 2.1.)
+          if(it.level === 3 && /^\d+\.\d+\./.test(it.text)){
+            const li = document.createElement('li');
+            li.innerHTML = `<a class="index-link" href="#${it.id}">${it.text}</a>`;
+            currentList.appendChild(li);
+          }
+        }
+      });
+
+      indexRoot.innerHTML = '';
+      indexRoot.appendChild(accord);
+      // Open first section by default
+      const first = accord.querySelector('.accordion-item');
+      if(first) first.classList.add('open');
+
+      // Smooth scroll with header offset
+      accord.querySelectorAll('a.index-link').forEach(a => {
+        a.addEventListener('click', (e) => {
+          e.preventDefault();
+          const id = a.getAttribute('href').slice(1);
+          const el = document.getElementById(id);
+          if(!el) return;
+          const headerH = 68; // approximate sticky header height
+          const y = el.getBoundingClientRect().top + window.scrollY - headerH - 12;
+          window.scrollTo({ top: y, behavior: 'smooth' });
+        });
+      });
+
+      // Active link highlighting on scroll
+      const linkMap = new Map();
+      accord.querySelectorAll('a.index-link').forEach(a => linkMap.set(a.getAttribute('href').slice(1), a));
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if(entry.isIntersecting){
+            const a = linkMap.get(entry.target.id);
+            if(a){
+              accord.querySelectorAll('a.index-link.active').forEach(x => x.classList.remove('active'));
+              a.classList.add('active');
+            }
+          }
+        });
+      }, { rootMargin: '-20% 0px -70% 0px', threshold: [0, 1] });
+      headings.forEach(h => observer.observe(h));
+    }
+
+    async function initPage(){
+      if(window.loadHeader){ await window.loadHeader('global-header'); }
+      const target = document.getElementById('az400-content');
+      try{
+        const res = await fetch('./Theory.txt', {cache: 'no-store'});
+        if(!res.ok){ target.innerHTML = '<p>No se pudo cargar el contenido.</p>'; return; }
+        const txt = await res.text();
+        target.innerHTML = transformToHtml(txt);
+        buildIndex();
+      }catch(e){
+        target.innerHTML = '<p>Error cargando el contenido.</p>';
+      }
+    }
+  </script>
+</head>
+<body>
+  <header>
+    <div id="global-header"></div>
+  </header>
+  <main>
+    <div class="layout az-wide">
+      <aside class="sidebar">
+        <h3>Índice AZ-400</h3>
+        <div id="az-index"></div>
+      </aside>
+      <div class="content-area">
+        <section class="card az-card">
+          <h2>AZ-400 — Teoría</h2>
+          <div id="az400-content"></div>
+        </section>
+      </div>
+    </div>
+  </main>
+  <script>
+    (async function(){ await initPage(); })();
+  </script>
+</body>
+</html>

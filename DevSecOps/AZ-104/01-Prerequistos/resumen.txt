@@ -1,0 +1,42 @@
+1. Opciones de administración de Azure
+
+Entre las herramientas que se usan habitualmente para la administración y las interacciones diarias, se incluyen las siguientes:
+
+Azure Portal para interactuar con Azure a través de una interfaz gráfica de usuario (GUI)
+Azure PowerShell y la interfaz de la línea de comandos de Azure (CLI) para las interacciones con Azure de línea de comandos y basadas en automatización
+Azure Cloud Shell para una interfaz de línea de comandos basada en web
+Azure Mobile App para supervisar y administrar los recursos desde el dispositivo móvil
+
+Azure Portal
+Azure Portal a menudo es la mejor interfaz para realizar tareas únicas, o cuando desea analizar opciones de configuración en detalle. el portal no permite automatizar tareas repetitivas.
+
+Azure PowerShell
+Azure PowerShell le permite conectarse a su suscripción de Azure y administrar recursos.
+Para usarlo, inicie PowerShell e instale el módulo de Azure PowerShell
+New-AzVM -ResourceGroupName "MyResourceGroup" -Name "TestVm" -Image "UbuntuLTS" ... este comando permite crear una MV
+
+CLI de Azure
+La CLI de Azure es un programa de línea de comandos que se conecta a Azure y ejecuta comandos administrativos en los recursos de Azure. La CLI de Azure se puede ejecutar en Windows, Linux o macOS.
+para crear una máquina virtual, abra una ventana del símbolo del sistema e instale la CLI de Azure y ejecuta:
+az vm create --resource-group MyResourceGroup --name TestVm --image Ubuntu2204 --generate-ssh-keys ...
+
+Azure Cloud Shell
+Azure Cloud Shell es un shell interactivo, autenticado y al que se puede acceder desde un explorador para administrar recursos de Azure mediante herramientas de scripting como la CLI de Azure y Azure PowerShell. Cloud Shell también tiene muchas otras herramientas de desarrollo disponibles, como editores de texto, herramientas de control de código fuente,
+
+Aplicación móvil de Azure
+puede realizar muchas tareas comunes de Azure, como:
+
+Compruebe el estado actual y las métricas críticas de los servicios.
+Manténgase informado con notificaciones y alertas sobre problemas de mantenimiento importantes.
+Revise las alertas más recientes de Azure.
+Inicie, detenga y reinicie máquinas virtuales o aplicaciones web.
+Conéctese a las máquinas virtuales.
+Administre permisos con el control de acceso basado en roles (RBAC).
+Use Azure Cloud Shell para ejecutar los scripts guardados o realizar tareas administrativas
+
+
+Paneles de Azure Portal
+¿Qué es un panel?
+Un panel es una colección personalizable de iconos de interfaz de usuario mostrados en Azure Portal. Los iconos se pueden agregar, quitar y colocar para crear la vista exacta deseada, y luego esa vista se guarda como un panel. Puede configurar varios paneles y pasar de uno a otro según sea necesario. Incluso puede compartir los paneles con otros miembros del equipo.
+
+Los paneles proporcionan flexibilidad sobre qué información se va a mostrar. Por ejemplo, puede crear paneles para roles específicos dentro de la organización y luego usar el control de acceso basado en roles (RBAC) para controlar quién puede acceder a ese panel.

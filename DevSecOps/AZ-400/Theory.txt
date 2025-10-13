@@ -1,0 +1,287 @@
+1. Introducción a DevOps
+
+DevOps es una metodología que integra el desarrollo de software (Dev) y las operaciones de TI (Ops) con el objetivo de mejorar la colaboración, automatizar procesos y acelerar la entrega de software.
+Su propósito es eliminar las barreras entre ambos equipos, aumentar la eficiencia y asegurar la calidad en la entrega continua de valor.
+
+1.1. Principales retos que resuelve DevOps
+Entre los retos principales que resuelve DevOps destacan:
+
+Lentitud en las entregas: automatiza el ciclo de desarrollo (CI/CD), permitiendo lanzamientos más rápidos y frecuentes.
+
+Falta de colaboración: fomenta el trabajo conjunto entre desarrollo y operaciones.
+
+Errores en despliegues: minimiza fallos mediante pruebas automáticas y despliegues controlados.
+
+Dificultad para mantener la calidad: facilita el monitoreo continuo y la retroalimentación inmediata.
+
+Gestión manual de infraestructura: implementa la “infraestructura como código” para reproducir entornos fácilmente.
+
+Falta de visibilidad: centraliza métricas y monitoreo para detectar incidentes antes de que afecten al usuario final.
+2. Metodologías Ágiles
+
+Las metodologías ágiles buscan entregar valor de forma iterativa, fomentar la colaboración y adaptarse al cambio de manera continua. Dentro de este marco, destacan Agile, Scrum y Kanban.
+
+2.1. Agile
+
+Es una filosofía de trabajo que promueve:
+
+Entregas rápidas y continuas de valor al cliente.
+
+Colaboración constante entre equipos y clientes.
+
+Adaptación al cambio en lugar de seguir planes rígidos.
+
+2.2. Scrum
+
+Scrum es un marco de trabajo ágil que organiza el desarrollo en ciclos cortos denominados sprints (de 1 a 4 semanas). Cada sprint busca entregar un producto funcional.
+
+Elementos principales:
+
+Roles: Product Owner, Scrum Master y Equipo de Desarrollo.
+
+Eventos: Sprint Planning, Daily Scrum, Sprint Review y Sprint Retrospective.
+
+Artefactos: Product Backlog, Sprint Backlog e Incremento.
+
+Scrum es ideal para proyectos complejos con requisitos cambiantes y equipos multidisciplinarios.
+
+2.3. Kanban
+
+Kanban es un método visual para gestionar el flujo de trabajo mediante tableros con columnas (por ejemplo: Por hacer → En progreso → Hecho).
+
+Principios fundamentales:
+
+Visualizar el trabajo.
+
+Limitar el trabajo en progreso (WIP).
+
+Mejorar continuamente el flujo.
+
+Es especialmente útil en equipos de soporte, mantenimiento y operaciones continuas.
+
+3. Métricas Ágiles en Azure DevOps
+
+Azure DevOps ofrece herramientas para medir el desempeño de los equipos y gestionar proyectos ágiles de forma integral.
+
+3.1. Velocity (Velocidad)
+
+La velocity mide cuánto trabajo completa un equipo durante un sprint (en puntos de historia, horas o tareas). Solo se contabiliza el trabajo marcado como Done.
+
+Usos principales:
+
+Predicción de capacidad futura: permite estimar el trabajo que puede abordarse en próximos sprints.
+
+Planificación realista: ayuda a definir un alcance alcanzable en cada iteración.
+
+Medición de progreso: muestra la evolución del rendimiento del equipo.
+
+3.2. Sprint Burndown Chart
+
+Gráfica que representa el trabajo restante durante el sprint.
+
+Eje X: tiempo (días del sprint).
+
+Eje Y: trabajo pendiente (puntos o tareas).
+
+Línea ideal: ritmo esperado de reducción del trabajo.
+
+Línea real: ritmo real del equipo.
+
+El objetivo es visualizar si el equipo está en camino de completar los compromisos del sprint.
+
+3.3. Lead Time y Cycle Time
+
+Lead Time: tiempo total desde la creación de una tarea hasta su finalización.
+
+Cycle Time: tiempo que transcurre desde que se inicia el trabajo hasta que se completa.
+
+Ambas métricas son fundamentales para evaluar la eficiencia del flujo de trabajo.
+
+3.4. Sprint Burnup Chart
+
+Muestra la cantidad de trabajo completado frente al total planificado.
+
+Eje X: tiempo (iteraciones, días o semanas).
+
+Eje Y: cantidad de trabajo (puntos o tareas).
+
+Línea de alcance total: trabajo planificado.
+
+Línea de trabajo completado: progreso real.
+
+Interpretación:
+
+Si las líneas se cruzan, el equipo alcanzó su meta.
+
+Si el alcance aumenta, se han agregado nuevas historias o tareas.
+
+Permite comunicar el progreso y gestionar los cambios de alcance.
+
+4. CMMI (Capability Maturity Model Integration)
+
+CMMI es un modelo de mejora de procesos desarrollado por el Software Engineering Institute (SEI). Su propósito es evaluar y elevar la madurez de los procesos de una organización.
+
+Objetivos principales:
+
+Estandarizar y madurar los procesos de desarrollo, mantenimiento y gestión.
+
+Mejorar la calidad, previsibilidad y eficiencia.
+
+Reducir riesgos asociados a la falta de procesos estructurados.
+
+5. Azure Boards
+
+Azure Boards es una herramienta dentro de Azure DevOps para planificar, realizar seguimiento y gestionar el trabajo de equipos de desarrollo mediante metodologías ágiles (Scrum, Kanban o híbridas).
+
+5.1. Componentes principales
+Elemento	Descripción
+Work Items	Unidades de trabajo (historias, bugs, tareas, etc.)
+Boards	Tableros visuales tipo Kanban o Scrum
+Backlog	Lista priorizada de trabajo pendiente
+Sprints	Iteraciones temporales de ejecución
+Dashboards / Reports	Visualización de progreso y métricas
+5.2. Beneficios principales
+
+Organización del trabajo: permite gestionar todas las tareas en un único entorno visual.
+
+Colaboración en equipo: integración con Azure Repos, GitHub, Pipelines, Teams y Slack.
+
+Transparencia y visibilidad: dashboards y reportes en tiempo real.
+
+Planificación ágil: soporte completo para Scrum y Kanban.
+
+Seguimiento y métricas: métricas clave como Lead Time, Cycle Time y Velocity.
+
+Integración con el ciclo DevOps: conexión con Repos, Pipelines, Test Plans y Artifacts.
+
+Personalización: flujos, campos y reglas adaptables.
+
+Acceso centralizado y seguro: infraestructura en la nube con control de acceso y auditoría.
+
+6. Contraseñas y Autenticación
+6.1. Credenciales vs. Métodos de autenticación
+
+Credenciales: lo que el usuario posee, sabe o es (contraseña, PIN, clave privada/pública, datos biométricos, etc.).
+
+Métodos de autenticación: mecanismos utilizados para validar la identidad del usuario (contraseña, PIN, biometría, passkey, app Authenticator, SMS, etc.).
+
+Microsoft Entra ID administra y cataloga estos métodos.
+
+6.2. Tipos clásicos de autenticación
+
+Contraseña y PIN: mecanismos básicos de acceso.
+
+Recomendación: reforzar con autenticación multifactor (MFA).
+
+6.3. Autenticación sin contraseña (Passwordless)
+
+Opciones disponibles en Microsoft Entra ID:
+
+Windows Hello for Business: clave asimétrica protegida por el dispositivo.
+
+Microsoft Authenticator (passkeys): inicio de sesión sin contraseña.
+
+FIDO2 / Passkeys: estándar universal para autenticación segura.
+
+Nota (2025): Microsoft está retirando el almacenamiento de contraseñas en Authenticator para promover el uso de passkeys.
+
+6.4. Restablecimiento de contraseña (SSPR)
+
+El Self-Service Password Reset (SSPR) permite a los usuarios restablecer contraseñas y desbloquear cuentas sin intervención del soporte técnico, reduciendo costes y tiempos de inactividad.
+
+6.5. Métodos MFA (Multifactor Authentication)
+
+Permiten añadir un segundo factor de autenticación (notificación, código TOTP, llamada, FIDO2, etc.).
+Se gestionan en Microsoft Entra ID dentro de Authentication Methods.
+
+6.6. OAuth y OpenID Connect
+
+La Microsoft Identity Platform implementa OAuth 2.0 y OpenID Connect, fundamentales para el inicio de sesión federado y la integración con aplicaciones externas mediante scopes, tokens y consent.
+
+6.7. Personal Access Tokens (PATs)
+
+Son “contraseñas alternativas” utilizadas para autenticación en Azure DevOps (CLI, Git o agentes).
+Deben tratarse como secretos y pueden limitarse por alcance y duración.
+
+6.8. Control de acceso basado en roles (RBAC)
+
+Azure RBAC define quién puede realizar qué acciones sobre qué recursos (suscripción, grupo o recurso).
+Permite usar roles integrados o personalizados con asignaciones específicas.
+
+7. Estrategias de Control de Versiones (VCS)
+7.1. Git LFS (Large File Storage)
+
+Reemplaza archivos grandes por punteros de texto, almacenando el contenido real en un servidor remoto compatible.
+
+Ventajas:
+
+Reducción del tamaño del repositorio.
+
+Integración con GitHub, Azure Repos, Bitbucket, etc.
+
+Soporte en pipelines CI/CD.
+
+Limitaciones:
+
+Requiere soporte del servidor remoto.
+
+Sujeto a cuotas de almacenamiento.
+
+Documentación: https://git-lfs.github.com/
+
+7.2. Git FAT (File Access Tool)
+
+Alternativa ligera a Git LFS, permite almacenar archivos grandes en backends configurables (red, FTP, S3, etc.).
+
+Ventajas:
+
+No depende de infraestructura LFS.
+
+Flexible para entornos privados.
+
+Desventajas:
+
+Menor soporte e integración CI/CD.
+
+Mantenimiento limitado.
+
+Documentación: https://github.com/jedbrown/git-fat
+
+7.3. Git Scalar (Microsoft)
+
+Herramienta creada por Microsoft para manejar repositorios de gran escala. Basada en GVFS (Git Virtual File System), optimiza Git para proyectos de cientos de GB o millones de archivos.
+
+Ventajas:
+
+Clones parciales y carga diferida.
+
+Mantenimiento automático (prefetch, garbage collection).
+
+Integración nativa con Azure DevOps.
+
+Limitaciones:
+
+No sustituye LFS ni FAT.
+
+Principalmente compatible con Windows.
+
+7.4. Git Subtree
+
+Permite incluir un subproyecto completo dentro de otro repositorio como subdirectorio, manteniendo su historial completo.
+
+Ventajas:
+
+Independencia respecto a submódulos.
+
+Clones completos y autosuficientes.
+
+Sin dependencias externas.
+
+Ejemplo de uso:
+
+git subtree add --prefix=libs/utils https://github.com/org/utils.git main --squash
+git subtree pull --prefix=libs/utils https://github.com/org/utils.git main --squash
+git subtree push --prefix=libs/utils https://github.com/org/utils.git main
+
+
+Ideal para mantener sincronizados subproyectos integrados dentro de un repositorio principal.
