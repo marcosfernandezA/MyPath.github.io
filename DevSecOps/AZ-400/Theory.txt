@@ -285,3 +285,845 @@ git subtree push --prefix=libs/utils https://github.com/org/utils.git main
 
 
 Ideal para mantener sincronizados subproyectos integrados dentro de un repositorio principal.
+
+8. Azure Pipelines Conceptos Básicos
+
+8.1. ¿Qué es Azure Pipelines?
+
+Azure Pipelines es un servicio de integración continua (CI) y entrega continua (CD) que forma parte de Azure DevOps. Permite compilar, probar y desplegar automáticamente aplicaciones en múltiples entornos y plataformas.  
+Se utiliza para automatizar el flujo de desarrollo de software, desde la integración del código hasta la entrega en producción.
+
+8.2. ¿Para qué se usa Azure Pipelines?
+
+Se usa principalmente para:
+- Automatizar compilaciones y pruebas.
+- Realizar despliegues continuos a entornos de desarrollo, staging o producción.
+- Integrar con repositorios como GitHub, Azure Repos o Bitbucket.
+- Garantizar consistencia y calidad en el ciclo de vida del software.
+
+8.3. Conceptos clave:
+
+Pipeline:
+Representa la definición completa del flujo de CI/CD. Contiene los pasos, tareas y condiciones que determinan cómo se construye, prueba y despliega una aplicación.
+
+Stage:
+Una agrupación lógica de trabajos (jobs) que se ejecutan como parte del pipeline.  
+Por ejemplo: “Build”, “Test”, “Deploy”.
+
+Job:
+Una unidad de ejecución dentro de un stage.  
+Cada job se ejecuta en un agente (máquina) y puede tener múltiples steps.
+
+Steps:
+Son las acciones individuales dentro de un job.  
+Cada step puede ser una tarea (task), script o comando.
+
+Tasks:
+Son bloques reutilizables que ejecutan operaciones comunes (por ejemplo, “DotNetCoreCLI@2”, “PublishBuildArtifacts@1”).  
+Las tareas se pueden agregar desde la interfaz o desde el archivo YAML.
+
+8.4. Componentes principales de un DevOps Pipeline
+
+Un pipeline completo se apoya en varios componentes esenciales que interactúan entre sí para garantizar la automatización del ciclo de vida del software:
+
+Source Code Repository:
+Contiene el código fuente y el historial de cambios del proyecto.  
+Ejemplos: Azure Repos, GitHub, Bitbucket o GitLab.  
+Es el punto de inicio del pipeline, donde se detectan commits o pull requests que activan la integración continua.
+
+Build Server:
+Es el servidor o agente encargado de compilar el código, ejecutar pruebas y generar artefactos.  
+Puede ser un agente hospedado por Microsoft (hosted agent) o uno propio (self-hosted agent).  
+Ejecuta las tareas definidas en el pipeline YAML.
+
+Test Server:
+Ejecuta pruebas automatizadas de unidad, integración o aceptación.  
+Permite validar que los cambios no rompan la funcionalidad existente.  
+Se pueden integrar frameworks como NUnit, xUnit, JUnit, Selenium o Cypress.
+
+Deployment Server:
+Gestiona los despliegues hacia entornos de destino (desarrollo, staging o producción).  
+Puede integrarse con Azure Web Apps, Kubernetes, Virtual Machines o cualquier infraestructura con acceso remoto (SSH, PowerShell, etc.).
+
+Feedback y Monitoring:
+Cierra el ciclo DevOps proporcionando retroalimentación continua a los desarrolladores y operadores.  
+Incluye métricas de compilación, resultados de pruebas, logs de despliegue y alertas.  
+Puede integrarse con herramientas como Application Insights, Azure Monitor, Grafana o Power BI para visualizar rendimiento y errores.
+
+8.5. Sintaxis YAML básica:
+
+Ejemplo de uso:
+```yaml
+# azure-pipelines.yml
+trigger:
+  - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+stages:
+  - stage: Build
+    jobs:
+      - job: BuildApp
+        steps:
+          - task: DotNetCoreCLI@2
+            inputs:
+              command: 'build'
+              projects: '**/*.csproj'
+
+  - stage: Test
+    dependsOn: Build
+    jobs:
+      - job: RunTests
+        steps:
+          - script: dotnet test
+            displayName: 'Ejecutar pruebas unitarias'
+
+8.6. Lenguajes, frameworks y plataformas compatibles:
+
+Azure Pipelines soporta una amplia gama de tecnologías:
+
+Lenguajes: C#, Java, JavaScript, Python, Go, PHP, Ruby, C++, Node.js, etc.
+
+Frameworks: .NET, .NET Core, ASP.NET, Angular, React, Django, Spring Boot, Maven, Gradle, etc.
+
+Plataformas: Windows, Linux, macOS, contenedores Docker y Kubernetes.
+
+8.7. Azure Marketplace:
+
+El Marketplace de Azure DevOps permite extender las funcionalidades de Azure Pipelines mediante extensiones y tareas personalizadas.
+Se pueden agregar integraciones con herramientas como SonarCloud, WhiteSource, Slack, Jenkins, Terraform, entre muchas otras.
+https://marketplace.visualstudio.com/azuredevops
+
+8.8. Planes gratuitos (Free tiers):
+
+Azure Pipelines ofrece planes gratuitos que incluyen:
+
+1,800 minutos (30 horas) de ejecución por mes para proyectos privados.
+
+Ejecución ilimitada para proyectos públicos de código abierto.
+
+Soporte para agentes hospedados en Microsoft (Windows, Linux, macOS).
+
+Opción de agentes propios (self-hosted) sin límite de tiempo.
+
+8.9. Beneficios principales:
+
+Automatización completa del ciclo CI/CD.
+
+Integración nativa con repositorios Git.
+
+Compatibilidad multiplataforma.
+
+Extensibilidad mediante tareas personalizadas.
+
+Escalabilidad y control de versiones en la configuración YAML.
+
+8.10. Automated Tests
+
+Los tests automatizados son una parte esencial del ciclo DevOps, ya que permiten validar de forma continua la calidad, estabilidad y funcionalidad del software sin intervención manual.  
+Su implementación dentro de Azure Pipelines garantiza que cada cambio en el código sea verificado automáticamente antes de ser promovido a entornos superiores.
+
+Importancia de las pruebas automatizadas:
+- Detectan errores en etapas tempranas del desarrollo, reduciendo costos de corrección.
+- Aseguran la calidad y confiabilidad del código en cada commit o despliegue.
+- Permiten una entrega continua (CD) más segura y predecible.
+- Facilitan la integración de cambios frecuentes en entornos colaborativos.
+- Mejoran la trazabilidad y la auditoría del proceso de validación.
+
+Pasos clave para implementar pruebas automatizadas:
+
+Definir una estrategia de pruebas:
+Establece qué tipos de pruebas se automatizarán, cómo se organizarán y qué criterios de cobertura se medirán.
+Tipos de pruebas más comunes:
+- Unit tests: verifican funciones o clases individuales (bajo nivel).
+- Integration tests: validan la interacción entre componentes.
+- Functional tests: garantizan que las funcionalidades cumplan los requisitos del negocio.
+- Regression tests: aseguran que nuevas versiones no rompan características existentes.
+- Performance tests: miden tiempos de respuesta, carga y estabilidad.
+- UI tests: automatizan la interacción con interfaces gráficas (por ejemplo, Selenium, Cypress).
+
+Cobertura de pruebas:
+El objetivo es medir qué porcentaje del código está cubierto por pruebas automáticas.  
+En entornos .NET se utilizan frameworks y herramientas como:
+- MSTest (Microsoft Unit Testing Framework)
+- NUnit
+- xUnit
+
+Ejemplo de uso:
+```yaml
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'test'
+    projects: '**/*Tests.csproj'
+    arguments: '--collect:"XPlat Code Coverage"'
+Crear una infraestructura de pruebas:
+Define dónde y cómo se ejecutarán los tests automatizados.
+Opciones comunes:
+
+Máquinas virtuales dedicadas (Windows o Linux) gestionadas por Azure DevOps.
+
+Contenedores Docker con entornos aislados para ejecución paralela.
+
+Azure Test Plans para administrar casos, ejecuciones y reportes centralizados.
+
+Uso de agentes self-hosted con dependencias preinstaladas.
+
+Desarrollar y mantener los tests automáticos:
+Los equipos de desarrollo deben escribir tests consistentes, reutilizables y mantenibles.
+Buenas prácticas:
+
+Adoptar una convención clara de nombres y estructuras de carpetas.
+
+Usar frameworks compatibles con el lenguaje del proyecto.
+
+Integrar las pruebas dentro del pipeline de CI/CD para su ejecución automática.
+
+Registrar y analizar métricas de resultados, fallos y cobertura.
+
+Revisar periódicamente los tests obsoletos o duplicados.
+
+9. Configuración de Pipelines
+
+9.1. Build Configuration
+
+La fase de build define cómo se compila y valida el código fuente antes de generar los artefactos de despliegue.
+
+Elementos típicos de la build configuration:
+- Code compilation: compilar el código fuente con herramientas específicas del lenguaje (dotnet build, npm run build, mvn package, etc.).
+- Code tests: ejecutar pruebas unitarias y de integración automáticas.
+- Packaging: generar paquetes binarios, contenedores Docker o artefactos listos para desplegar.
+- Artifact publishing: almacenar los resultados en Azure Artifacts, GitHub Packages o repositorios externos.
+- Code analysis: incluir herramientas como SonarQube, Checkstyle, ESLint, o CodeQL para validar calidad.
+
+Ejemplo de uso:
+```yaml
+- stage: Build
+  jobs:
+    - job: BuildApp
+      steps:
+        - task: DotNetCoreCLI@2
+          inputs:
+            command: 'build'
+            projects: '**/*.csproj'
+        - task: DotNetCoreCLI@2
+          inputs:
+            command: 'test'
+            projects: '**/*Tests.csproj'
+        - task: PublishBuildArtifacts@1
+          inputs:
+            pathToPublish: '$(Build.ArtifactStagingDirectory)'
+            artifactName: 'drop'
+9.2. Release Tasks
+
+Los release tasks representan las acciones post-build, normalmente relacionadas con la entrega o despliegue.
+
+Tareas comunes:
+
+Deployment: publicar el artefacto en entornos como Azure Web Apps, Kubernetes o servidores on-premises.
+
+Configuration: ejecutar scripts PowerShell o Bash para preparar el entorno.
+
+Notifications: enviar mensajes a equipos (Teams, Slack, correo).
+
+Validation: ejecutar pruebas de aceptación o smoke tests tras el despliegue.
+
+Ejemplo de uso:
+
+yaml
+Copiar código
+- stage: Deploy
+  dependsOn: Build
+  jobs:
+    - deployment: DeployToProd
+      environment: 'production'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: AzureWebApp@1
+                inputs:
+                  appName: 'myapp-prod'
+                  package: '$(Pipeline.Workspace)/drop/*.zip'
+9.3. Deployment Customization
+
+Azure Pipelines permite personalizar la configuración de despliegue mediante variables, secretos y aprobaciones manuales.
+
+Configuraciones clave:
+
+Variables: se definen a nivel de pipeline, stage o job (variables: en YAML o desde la UI).
+
+Secret variables: almacenadas de forma segura en Azure DevOps o Azure Key Vault.
+
+Environment variables: permiten inyectar valores en los scripts de despliegue.
+
+Approvals and checks: controlan la promoción de despliegues entre entornos (por ejemplo, revisión antes de pasar a producción).
+
+Ejemplo de uso:
+
+yaml
+Copiar código
+variables:
+  environment: 'staging'
+  connectionString: $(dbConnectionString)
+Configuración de permisos en el SCM
+
+10.1. Permisos a nivel de repositorio:
+
+Controlan quién puede leer, escribir o administrar el repositorio completo.
+
+Lectura (Read): acceso de solo lectura.
+
+Contribución (Contribute): permite commits y pushes.
+
+Administración (Admin): control total, incluyendo configuración de ramas y políticas.
+
+10.2. Permisos a nivel de rama:
+
+Definen restricciones sobre commits, merges y aprobaciones en ramas específicas.
+
+Branch policies: exigen revisiones de código antes de hacer merge.
+
+Status checks: requieren builds o tests exitosos antes del merge.
+
+Protecciones de fuerza (Force push protection): impiden sobrescribir el historial.
+
+10.3. Permisos a nivel de archivo:
+
+A través de Git LFS o reglas de acceso en Azure Repos, se puede restringir acceso a ficheros sensibles (por ejemplo, claves o configuraciones).
+
+Comandos Git básicos
+
+11.1. Comandos principales:
+
+git init → inicializa un repositorio.
+
+git add → agrega archivos al área de staging.
+
+git commit → guarda cambios en el historial.
+
+git push → envía commits al repositorio remoto.
+
+git pull → sincroniza cambios desde el remoto.
+
+git merge → combina ramas.
+
+git branch → lista o crea ramas nuevas.
+
+11.2. Recuperación y restauración:
+
+git revert <commit_hash> → crea un commit que deshace los cambios del commit especificado.
+
+git restore <file_path> → restaura un archivo a su versión previa.
+
+git checkout <commit_hash> -- <file_path> → recupera un archivo de un commit anterior.
+
+git branch <nombre> → crea una nueva rama.
+
+git checkout <rama> → cambia de rama.
+
+git reset --hard <commit_hash> → mueve el HEAD y borra cambios locales.
+
+11.3. Historial y auditoría:
+
+git log → muestra el historial de commits.
+
+git reflog → muestra todos los movimientos del HEAD, incluso los descartados, útil para recuperar commits perdidos.
+
+11.4. Estrategias de fusión y rebase:
+
+Merge:
+Combina ramas manteniendo todos los commits.
+Produce un commit de merge explícito.
+
+Fast-forward merge:
+Se realiza cuando no hay divergencia entre ramas.
+No crea un nuevo commit, solo avanza el puntero.
+
+Rebase:
+Reaplica commits sobre otra rama, generando un historial más lineal.
+Se usa para mantener la limpieza del historial sin commits de merge.
+
+Squash merge:
+Combina todos los commits de una rama en un único commit al fusionarla.
+Ideal para mantener un historial compacto y legible.
+
+Limpieza y mantenimiento del sistema de control de código fuente
+
+12.1. Objetivo:
+
+Mejorar el rendimiento del sistema de control de versiones y optimizar el almacenamiento.
+
+12.2. Prerrequisitos:
+
+Comunicación: coordinar con los equipos para evitar conflictos durante la limpieza.
+
+Backups: crear copias de seguridad antes de realizar operaciones destructivas.
+
+Replicación: verificar que las réplicas o mirrors estén sincronizadas para evitar pérdida de datos.
+
+12.3. Limpieza manual:
+
+Uso de comandos Git locales para eliminar objetos obsoletos y liberar espacio:
+
+bash
+Copiar código
+git gc --prune=now --aggressive
+git repack -a -d -l
+12.4. Automatización mediante Azure DevOps REST API:
+
+Azure DevOps expone una REST API que permite:
+
+Eliminar artefactos antiguos.
+
+Borrar builds obsoletos.
+
+Gestionar pipelines y releases automáticamente.
+
+Auditar repositorios y agentes.
+
+Referencia:
+https://learn.microsoft.com/en-us/rest/api/azure/devops/?view=azure-devops-rest-7.1
+
+12.5. Buenas prácticas:
+
+Programar limpiezas periódicas automáticas.
+
+Monitorear el tamaño del repositorio y artefactos.
+
+Usar almacenamiento de artefactos externo para builds pesados.
+
+Documentar los procesos de limpieza y recuperación.
+
+13. Escaneo de dependencias, seguridad y calidad del código
+
+13.1. Dependency Scanning
+
+El escaneo de dependencias (Dependency Scanning) permite identificar librerías o paquetes vulnerables utilizados por la aplicación.
+
+Su objetivo es detectar vulnerabilidades conocidas en versiones de dependencias externas y sugerir actualizaciones seguras.
+
+13.2. Security Scanning
+
+El escaneo de seguridad analiza el código fuente y los artefactos compilados para detectar vulnerabilidades, malas configuraciones o secretos expuestos.
+
+Tipos de análisis:
+
+Static Application Security Testing (SAST): analiza el código fuente (por ejemplo, SonarQube, Checkmarx, Fortify).
+
+Dynamic Application Security Testing (DAST): analiza aplicaciones en ejecución simulando ataques (por ejemplo, OWASP ZAP).
+
+Container scanning: analiza imágenes de Docker buscando vulnerabilidades conocidas.
+
+13.3. Code Coverage
+
+El code coverage mide el porcentaje de código ejecutado durante las pruebas.
+Se utiliza para evaluar la efectividad de los tests automáticos y mantener un umbral mínimo de calidad.
+
+Herramientas y reportes comunes:
+
+Cobertura (.NET y C#)
+
+JaCoCo (Java)
+
+Istanbul / nyc (JavaScript)
+
+Pytest-cov (Python)
+
+13.4. Quality Gates
+
+Los quality gates definen condiciones mínimas que deben cumplirse para aprobar una compilación o despliegue.
+Actúan como filtros de calidad que bloquean la promoción de código que no cumpla los estándares.
+
+Ejemplos de métricas:
+
+Cobertura mínima del 80%.
+
+Ausencia de vulnerabilidades críticas o bloqueantes.
+
+Cumplimiento de convenciones de estilo y documentación.
+
+13.5. Security and Governance Gates
+
+Los security gates y governance gates establecen políticas y controles que aseguran que las entregas cumplan los requisitos de seguridad y cumplimiento normativo.
+
+Componentes clave:
+
+Azure Policy: permite definir y aplicar reglas de cumplimiento sobre recursos de Azure (por ejemplo, restringir ubicaciones, tamaños de VM, o configuraciones inseguras).
+
+Azure DevOps Compliance: provee integraciones para auditar pipelines, validar configuraciones y generar reportes de conformidad.
+
+Approvals & Checks: en entornos de despliegue, se pueden configurar revisiones humanas o automáticas basadas en políticas de seguridad.
+
+Security Center & Defender for Cloud: integran escaneos automatizados y recomendaciones en pipelines.
+
+14. Implementar infraestructura
+
+La implementación de la infraestructura para Azure Pipelines es un paso fundamental para garantizar la ejecución eficiente, segura y escalable de los procesos de integración y entrega continua.  
+Una planificación adecuada de la infraestructura influye directamente en los costos, el rendimiento y la disponibilidad de los pipelines.
+
+14.1. Consideraciones generales
+
+Al diseñar la infraestructura de un sistema CI/CD con Azure DevOps es necesario evaluar:
+- Los tipos de agentes que se utilizarán (Microsoft-hosted o self-hosted).
+- Las herramientas y entornos de ejecución requeridos.
+- Las dependencias y la conectividad entre servicios.
+- Los costos de operación y mantenimiento a largo plazo.
+- Las licencias y los límites de uso disponibles.
+
+14.2. Agentes hospedados vs agentes autohospedados
+
+Azure Pipelines ejecuta las tareas del pipeline en agentes, que son máquinas virtuales o físicas configuradas para procesar las compilaciones y despliegues.
+
+Microsoft-hosted agents:
+- Proporcionados por Microsoft y administrados automáticamente.
+- Escalan bajo demanda y se eliminan al finalizar el trabajo.
+- Incluyen imágenes preconfiguradas con herramientas comunes (Windows, Ubuntu, macOS).
+- No requieren mantenimiento manual.
+- Adecuados para proyectos pequeños, medianos o públicos.
+- Limitación: tiempo de ejecución mensual gratuito limitado (1,800 minutos para proyectos privados).
+
+Self-hosted agents:
+- Configurados y gestionados por la organización.
+- Pueden estar en la nube, en local o en entornos híbridos.
+- Permiten control total sobre las herramientas, dependencias y red.
+- Sin límite de minutos de ejecución.
+- Requieren mantenimiento, actualizaciones y supervisión por parte del equipo.
+- Recomendados para cargas de trabajo intensivas, entornos aislados o requisitos de cumplimiento estrictos.
+
+Comparativa de costos:
+- Los agentes hospedados por Microsoft tienen un plan gratuito y opciones de pago por minuto adicional.
+- Los agentes autohospedados no generan costo directo de Azure Pipelines, pero implican costo de infraestructura (VMs, energía, red, licencias).
+- En entornos corporativos, el costo total se evalúa considerando uso, disponibilidad y soporte requerido.
+
+14.3. Selección de herramientas
+
+Azure Pipelines:
+- Herramienta moderna y nativa dentro de Azure DevOps.
+- Compatible con YAML pipelines (as code) y configuración visual.
+- Soporte multiplataforma (Windows, Linux, macOS, contenedores).
+- Integración con GitHub, Azure Repos y Bitbucket.
+- Permite automatizar desde compilaciones simples hasta despliegues multi-stage y multi-environment.
+
+VSTS (Visual Studio Team Services, legado):
+- Plataforma predecesora de Azure DevOps.
+- Hoy en día se integra completamente dentro de Azure DevOps Services.
+- Las organizaciones que aún mantienen VSTS deben planificar migraciones hacia Azure DevOps para aprovechar las nuevas funcionalidades y soporte extendido.
+
+14.4. Licenciamiento
+
+Licencias en Azure Pipelines:
+- Plan gratuito: incluye 1,800 minutos/mes para proyectos privados y ejecución ilimitada para proyectos públicos.
+- Usuarios con licencias de Visual Studio o MSDN tienen minutos adicionales.
+- Posibilidad de adquirir paralelismo adicional (concurrent pipelines) mediante pago.
+
+Licencias en agentes self-hosted:
+- No hay costo por agente dentro de Azure Pipelines.
+- Se requiere licencia del sistema operativo o suscripción de la infraestructura donde se ejecuten (por ejemplo, VM en Azure o servidor físico).
+- El mantenimiento, actualizaciones y seguridad dependen del equipo DevOps interno.
+
+14.5. Conectividad y seguridad
+
+Los agentes necesitan conectividad a los servicios de Azure DevOps para recibir y ejecutar trabajos.  
+Recomendaciones:
+- Permitir comunicación saliente hacia *.dev.azure.com y *.visualstudio.com en puertos 443 y 80.
+- Usar certificados SSL válidos y revisar reglas de firewall corporativo.
+- Para entornos aislados, se pueden configurar agentes dentro de redes privadas con Azure DevOps Server (on-premises).
+- Implementar autenticación segura mediante tokens personales (PAT) o Managed Identity en Azure.
+
+14.6. Mantenimiento y operación
+
+Buenas prácticas para mantener la infraestructura de pipelines:
+- Actualizar regularmente los agentes self-hosted para obtener nuevas versiones del agente y herramientas preinstaladas.
+- Monitorear el estado de ejecución y logs de los agentes.
+- Implementar redundancia (varios agentes) para evitar cuellos de botella.
+- Limpiar artefactos y logs antiguos para optimizar el almacenamiento.
+- Automatizar el aprovisionamiento y desmantelamiento de agentes mediante scripts o Azure DevOps REST API.
+- Documentar la infraestructura, roles y procedimientos de recuperación ante fallos.
+
+14.7. Recomendaciones finales
+
+- Para entornos pequeños o proyectos open source: usar agentes hospedados por Microsoft (fáciles y sin mantenimiento).
+- Para grandes organizaciones o entornos críticos: preferir agentes self-hosted con control sobre red, dependencias y seguridad.
+- Combinar ambos tipos de agentes para lograr equilibrio entre agilidad y control.
+- Revisar periódicamente los costos y la eficiencia operativa de los pipelines.
+
+
+15. Azure Container Instances y Agentes Self-Hosted
+
+15.1. Azure Container Instances (ACI)
+
+Azure Container Instances (ACI) es un servicio de Azure que permite ejecutar contenedores en la nube sin necesidad de administrar servidores o clústeres.  
+Es ideal para cargas de trabajo efímeras, pipelines de CI/CD, testing o microservicios ligeros que requieren arranque rápido y facturación por segundo.
+
+Principales características:
+- Despliegue de contenedores en segundos sin infraestructura subyacente.
+- Ejecución bajo demanda con pago por uso.
+- Compatibilidad con imágenes públicas (Docker Hub) o privadas (Azure Container Registry).
+- Integración con redes virtuales (VNETs), volúmenes persistentes y Azure Monitor.
+- Ideal para tareas de build temporal, pruebas automáticas o procesamiento por lotes.
+
+15.2. Políticas de reinicio (Container Restart Policies)
+
+Las políticas de reinicio controlan el comportamiento de los contenedores cuando terminan su ejecución.
+
+Opciones disponibles:
+
+Always → el contenedor se reinicia automáticamente al finalizar.
+
+OnFailure → se reinicia solo si el contenedor falla (exit code distinto de 0).
+
+Never → no se reinicia tras la finalización.
+
+Ejemplo de uso:
+
+bash
+az container create \
+  --name taskrunner \
+  --image mcr.microsoft.com/azuredocs/aci-helloworld \
+  --restart-policy OnFailure
+15.3. Variables de entorno (Container Environment Variables)
+
+Permiten pasar configuraciones o credenciales al contenedor sin modificar la imagen base.
+
+Ejemplo de uso:
+
+bash
+az container create \
+  --name webapp \
+  --image nginx \
+  --environment-variables ENVIRONMENT=staging API_URL=https://api.contoso.com
+También se pueden usar secretos almacenados en Azure Key Vault mediante --secure-environment-variables.
+
+15.4. Troubleshooting de contenedores
+
+Para diagnosticar problemas en Azure Container Instances, se pueden utilizar los siguientes comandos:
+
+Obtener estado del contenedor:
+
+bash
+az container show \
+  --name mycontainer \
+  --resource-group MyRG \
+  --output table
+Ver logs del contenedor:
+
+bash
+az container logs \
+  --name mycontainer \
+  --resource-group MyRG
+Ejecutar un comando dentro del contenedor en ejecución:
+
+bash
+az container exec \
+  --name mycontainer \
+  --resource-group MyRG \
+  --exec-command "/bin/bash"
+Eliminar un contenedor:
+
+bash
+az container delete \
+  --name mycontainer \
+  --resource-group MyRG \
+  --yes
+
+15.5. Deep Dive: Agentes Self-Hosted en Azure DevOps
+
+Los agentes self-hosted son componentes clave en la infraestructura DevOps avanzada.
+Permiten ejecutar pipelines en entornos controlados por la organización, ofreciendo flexibilidad, rendimiento y cumplimiento normativo.
+
+15.5.1. Casos de uso típicos
+
+Entornos con dependencias específicas no disponibles en agentes Microsoft-hosted.
+
+Conectividad restringida a redes privadas o sistemas on-premises.
+
+Requisitos de cumplimiento, auditoría o certificaciones (por ejemplo, ISO, HIPAA).
+
+Ejecución de tareas intensivas en CPU o GPU (por ejemplo, builds de IA o compilación nativa).
+
+Optimización de costos mediante reutilización de infraestructura interna existente.
+
+15.5.2. Beneficios de los agentes self-hosted
+
+Control total sobre la configuración, dependencias y versión del agente.
+
+Sin límite de minutos de ejecución.
+
+Ejecución más rápida en entornos personalizados.
+
+Mayor integración con recursos locales o privados.
+
+Posibilidad de aislamiento por equipos o proyectos.
+
+15.5.3. VM Templates para agentes
+
+Se pueden crear plantillas de máquinas virtuales (VM Templates) preconfiguradas con herramientas, SDKs y dependencias necesarias para ejecutar pipelines.
+Esto facilita la creación rápida de nuevos agentes idénticos en entornos escalables.
+
+Ejemplo de configuración:
+
+Crear una VM base con Windows o Ubuntu.
+
+Instalar dependencias (Git, .NET SDK, Node.js, Docker, PowerShell, etc.).
+
+Instalar el agente de Azure Pipelines:
+
+Capturar la imagen como plantilla en Azure (Managed Image).
+
+Usar Azure Scale Sets para escalar dinámicamente el número de agentes según demanda.
+
+15.5.4. Contenerización de agentes self-hosted
+
+Para entornos modernos, los agentes self-hosted también pueden ejecutarse dentro de contenedores Docker.
+Esto simplifica la gestión, actualización y portabilidad de los agentes.
+
+Ventajas:
+
+Despliegue rápido y reproducible.
+
+Aislamiento por pipeline o equipo.
+
+Mantenimiento simplificado mediante imágenes versionadas.
+
+Integración con Kubernetes o Azure Container Instances para autoescalado.
+
+16. Estrategias de despliegue y exposición progresiva
+
+16.1. Introducción
+
+En DevOps moderno, las estrategias de despliegue buscan minimizar el riesgo y el impacto en el usuario final durante la publicación de nuevas versiones.  
+Azure Pipelines y otros servicios de Azure permiten aplicar enfoques progresivos y controlados para garantizar una entrega continua confiable.
+
+Las principales estrategias incluyen:
+- Blue-Green Deployment
+- Canary Release
+- Ring Deployment
+- Progressive Exposure
+- Feature Flags
+- A/B Testing
+
+16.2. Blue-Green Deployment
+
+La estrategia Blue-Green Deployment consiste en mantener dos entornos idénticos — "Blue" (actual en producción) y "Green" (nueva versión).  
+El tráfico de usuarios se redirige del entorno Blue al Green una vez que la nueva versión ha sido validada.
+
+Flujo típico:
+1. Se despliega la nueva versión en el entorno Green.
+2. Se ejecutan pruebas automáticas de validación.
+3. Se redirige el tráfico al entorno Green mediante un cambio en el balanceador de carga (Azure Front Door, Application Gateway, o Traffic Manager).
+4. El entorno Blue queda disponible como backup inmediato.
+
+Ventajas:
+- Despliegues sin downtime.
+- Rollback instantáneo si ocurre un fallo.
+- Validación previa al cambio de tráfico.
+
+16.3. Canary Release
+
+El Canary Release permite desplegar una nueva versión solo a una parte del tráfico o grupo de usuarios antes de una liberación total.
+
+Etapas comunes:
+
+Se lanza la versión “canary” a un pequeño porcentaje de usuarios.
+
+Se monitorean métricas de rendimiento, errores y feedback.
+
+Si el resultado es positivo, se amplía gradualmente el despliegue.
+
+Ventajas:
+
+Detección temprana de errores sin afectar a todos los usuarios.
+
+Reducción de riesgo en despliegues críticos.
+
+Monitoreo y rollback sencillos.
+
+16.4. Ring Deployment
+
+El Ring Deployment (también conocido como despliegue por anillos) es una evolución del modelo canario, donde los despliegues se realizan en anillos o grupos definidos de usuarios, entornos o regiones.
+
+Ejemplo de anillos:
+
+Ring 0 → entorno interno (QA / Dev).
+
+Ring 1 → usuarios piloto o equipo de producto.
+
+Ring 2 → una región o grupo controlado de clientes.
+
+Ring 3 → despliegue global o total.
+
+Azure Pipelines permite configurar stages o environments separados representando cada anillo, con gates o aprobaciones antes de avanzar.
+
+Ventajas:
+
+Control progresivo del despliegue.
+
+Validación en etapas intermedias.
+
+Despliegues seguros en entornos distribuidos globalmente.
+
+16.5. Progressive Exposure
+
+El Progressive Exposure combina métricas de observabilidad con automatización de despliegues para liberar versiones gradualmente según resultados en tiempo real.
+La exposición se ajusta automáticamente con base en telemetría, errores o métricas de negocio.
+
+Ventajas:
+
+Despliegues adaptativos y basados en datos.
+
+Reducción del impacto de errores en producción.
+
+Integración nativa con observabilidad en Azure.
+
+16.6. Feature Flags
+
+Los Feature Flags permiten habilitar o deshabilitar funcionalidades sin necesidad de hacer un nuevo despliegue.
+Son una herramienta clave para realizar dark launches, pruebas controladas o despliegues parciales.
+
+Implementación en Azure:
+
+Usar Azure App Configuration para gestionar flags centralizados.
+
+Integrar con SDKs de Azure Feature Management.
+
+Controlar las flags por usuario, región, versión o entorno.
+
+Ventajas:
+
+Control granular sobre nuevas funcionalidades.
+
+Activación dinámica sin redeploy.
+
+Facilita pruebas A/B y despliegues progresivos.
+
+16.7. A/B Testing
+
+El A/B Testing consiste en presentar dos o más variantes de una funcionalidad o interfaz a diferentes grupos de usuarios para comparar rendimiento, uso o satisfacción.
+
+Ventajas:
+
+Evaluación objetiva de nuevas características.
+
+Optimización basada en datos reales de uso.
+
+Reducción de riesgo al introducir cambios en la experiencia de usuario.
+
+16.8. Uso de Azure Deployment Manager
+
+Azure Deployment Manager (ADM) permite coordinar despliegues complejos y progresivos en entornos distribuidos.
+Se integra con Azure Resource Manager (ARM) para orquestar pasos, validar dependencias y aplicar políticas antes de cada despliegue.
+
+Casos de uso:
+
+Coordinar despliegues de microservicios o componentes distribuidos.
+
+Controlar secuencias de despliegue en múltiples regiones.
+
+Aplicar verificaciones o gates entre etapas (health checks, políticas, aprobaciones).
+
+Ventajas:
+
+Despliegues más seguros y predecibles.
+
+Control centralizado de dependencias y orden de implementación.
